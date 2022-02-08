@@ -1,0 +1,114 @@
+
+import room from "./room.js";
+import item from "./item.js";
+import entity from "./entity.js";
+import monster from "./monster.js";
+import img from "./img.js";
+import reqImg from "./reqImg.js";
+import {walledRoom, compile} from "./compile.js";
+
+/*
+import room from "./room.js";
+import room from "./room.js";
+import room from "./room.js";
+ 
+entities, monsters, items have displayStrings
+*/
+
+var data1 = {
+rooms : { // ----------------------- rooms
+root : new room("root", 
+	[new entity("root portal", "portal", 600, 300, 800, 400,"", ["1 1 1", 500, 550], [], "./images/cave.png")], // entities - "1 1 1" or "gen"
+	[], // walls
+	[new img("./images/flower.png", 100, 100),new img("./images/flower.png", 200, 200), new img("./images/flower.png", 300, 300)], // images
+	[], // reqImgs
+	[], // monsters
+	[], // drops
+	"./images/outside.png", //background
+	),
+	
+// depth, x, y
+"1 1 1":new room("1 1 1", 
+	[new entity("1 1 1 portal left", "portal", 0, 0, 50, 800,"",["1 0 1", 800, 325], [], undefined),
+	new entity("1 1 1 portal right", "portal", 950, 0, 1000, 800, "You need $1 to go here",["1 2 1", 200, 325], ["red potion"], undefined),
+	new entity("1 1 1 portal mid", "portal", 300, 300, 350, 350, "This is some kind of portal, but it's inactive", ["2 1 1", 400, 400],["crystal flower"], undefined), ], // entities
+	[], // walls
+	[new img("./images/multicolor.png", 200, 400, "not met", ["red potion"])], // images
+	[new reqImg([
+		{requirements:["crystal flower"], image:"./shapes/green_circle.png"},
+		{requirements:["green potion"], image:"./shapes/yellow_circle.png"},
+		{requirements:[], image:"./shapes/red_circle.png"},
+	],300, 300)], // reqImgs
+	[], // monsters
+	[], // drops
+	"./images/cave1.png", //background
+	),
+
+
+"1 0 1": new room("1 0 1", 
+	[new entity("1 0 1 portal right", "portal", 950, 0, 1000, 800,"", ["1 1 1",200,325], [], undefined),
+	new entity("1 0 1 chest", "chest", 450, 200, 500, 250,"This chest is locked" ,[new item("demon ring", "./images/demon_ring.png", 400, 150, "You picked up $1")],["gold key"],"./images/multicolor.png" )], // entities 
+	[[100, 100, 500, 500]], // walls
+	[], // images
+	[], // reqImgs
+	[[400,400,new monster("1 1 2 lizardman 1","You need $1 to kill this monster", "./images/lizardman.png", ["angel ring"], 4, 40, 40)],
+	[300,400,new monster("1 1 2 lizardman 2","You need $1 to kill this monster", "./images/lizardman.png", ["angel ring"], 4, 40, 40)],
+	[500,400,new monster("1 1 2 lizardman 3", "You need $1 to kill this monster","./images/lizardman.png", ["angel ring"], 4, 40, 40)]], // monsters
+	[new item("red potion","./images/red_potion.png", 400, 400,"You picked up $1" )], // drops
+	"./images/cave1.png", //background
+	),
+	
+"1 2 1":new room("1 2 1", 
+	[new entity("1 2 1 portal left", "portal", 0, 0, 50, 800, "",["1 1 1", 800, 325], [], undefined),
+	new entity("1 2 1 npc", "npc", 500, 200, 550, 250, "", [
+	{requirements : ["green potion"], displayString : "You got the potion!", items:[
+	new item("crystal flower", "./images/crystal_flower.png", 200, 200, "This flower looks weird")
+	]},
+	{requirements : [], displayString : "Get the potion", items:[]},
+	], [], "./images/npc_1.png")], // entities
+	[], // walls
+	[], // images
+	[], // reqImgs
+	[], // monsters
+	[], // drops
+	"./images/cave2.png", //background
+	),
+
+
+"2 1 1":new room("2 1 1", 
+	[new entity("2 1 1 portal back", "portal", 200, 200, 250, 250, "",["1 1 1", 500, 200], [], "./shapes/green_circle.png")], // entities
+	[], // walls
+	[], // images
+	[], // reqimgs
+	[], // monsters
+	[], // drops
+	"./images/cave3.png", //background
+	),
+
+ 
+}, items : {// ----------------------- items
+	root : [],
+	"1 1 1" : [new item("angel ring","./images/angel_ring.png", 400, 400, "You picked up $1")],
+	"1 0 1" : [],
+	"1 2 1" : [new item("green potion","./images/green_potion.png", 800, 400, "You picked up $1")],
+	"2 1 1" : [new item("gold key","./images/gold_key.png", 400, 250, "You picked up $1")],
+}
+
+}
+
+export default data1;
+/*
+
+{
+root : new room("", 
+	[], // entities
+	[], // walls
+	[], // images
+	[], // reqimgs
+	[], // monsters
+	[], // drops
+	"", //background
+	)
+}
+
+*/

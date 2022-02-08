@@ -1,0 +1,9 @@
+import dag from "./dag.js";
+import {random, randint, choice} from "./random.js"
+function makeDag(vertices, seed){
+	if(vertices < 3){
+		throw new Error("vertices less than 3");
+	}
+	
+
+}

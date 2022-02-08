@@ -1,0 +1,7 @@
+brighten monsters:
+
+for %i in (*.png) do magick.exe convert %~ni.png -fill white -colorize 80%  %~ni_attack.png
+
+get first floor monsters:
+
+Object.keys(itemHeldBy).filter((x) => itemHeldBy[x].location[8] == "0" && itemHeldBy[x].holderType == "monster").map((x) => [itemHeldBy[x].location,itemHeldBy[x].data.name] )

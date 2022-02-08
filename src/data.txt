@@ -1,0 +1,70 @@
+
+import room from "./room.js";
+import item from "./item.js";
+import entity from "./entity.js";
+import monster from "./monster.js";
+import img from "./img.js";
+import reqImg from "./reqImg.js";
+import {walledRoom, compile} from "./compile.js";
+
+/*
+import room from "./room.js";
+import room from "./room.js";
+import room from "./room.js";
+ 
+entities, monsters, items have displayStrings
+*/
+
+var data1 = {
+rooms : { // ----------------------- rooms
+root : new room("root", 
+	[new entity("root portal", "portal", 600, 300, 800, 400,"", ["1 1 1", 500, 550], [], "./images/cave.png")], // entities - "1 1 1" or "gen"
+	[], // walls
+	[new img("./images/flower.png", 100, 100),new img("./images/flower.png", 200, 200), new img("./images/flower.png", 300, 300)], // images
+	[], // reqImgs
+	[], // monsters
+	[], // drops
+	"./images/outside.png", //background
+	),
+	
+// depth, x, y
+"1 1 1":new room("1 1 1", 
+	[new entity("1 1 1 portal mid", "portal", 300, 300, 350, 350, "This is some kind of portal, but it's inactive", ["gen", 400, 400],[], "./shapes/green_circle.png"), ], // entities
+	[], // walls
+	[], // images
+	[], // reqImgs
+	[], // monsters
+	[], // drops
+	"./images/cave1.png", //background
+	),
+
+"gen" : walledRoom("gen", {"destination":"1 1 1", "reqs":["crystal flower"]}
+,{"destination":"1 1 1", "reqs":["crystal flower"]},
+{"destination":"1 1 1", "reqs":["crystal flower"]},
+{"destination":"1 1 1", "reqs":["crystal flower"]}  )
+
+ 
+}, items : {// ----------------------- items
+	root : [],
+	"1 1 1" : [new item("crystal flower","./images/crystal_flower.png", 400, 400, "You picked up $1")],
+	"gen" : [],
+}
+
+}
+
+export default data1;
+/*
+
+{
+root : new room("", 
+	[], // entities
+	[], // walls
+	[], // images
+	[], // reqimgs
+	[], // monsters
+	[], // drops
+	"", //background
+	)
+}
+
+*/

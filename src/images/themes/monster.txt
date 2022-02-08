@@ -1,0 +1,104 @@
+export var monsterClasses = {
+	 "goblin": {
+            "name" : "goblin",
+            "speed" : 3,
+            "width": 80,
+            "height" : 80,
+            "images" : [ 
+
+ { "link" : "goblin_blue.png", "color":"blue"},  
+ { "link" : "goblin_green.png", "color":"green"},  
+ { "link" : "goblin_red.png", "color":"red"},  
+ { "link" : "goblin_yellow.png", "color":"yellow"},  
+ { "link" : "goblin_black.png", "color":"black"},  
+
+            ]
+        } ,
+		
+	"fairy": {
+            "name" : "fairy",
+            "speed" : 4,
+            "width": 70,
+            "height" : 70,
+            "images" : [
+            
+  { "link" : "fairy_blue.png", "color":"blue"},
+  { "link" : "fairy_green.png", "color":"green"},
+  { "link" : "fairy_red.png", "color":"red"},
+  { "link" : "fairy_yellow.png", "color":"yellow"},
+  { "link" : "fairy_purple.png", "color":"purple"},
+  { "link" : "fairy_black.png", "color":"black"},
+  { "link" : "fairy_white.png", "color":"white"},
+
+            ]
+        } ,
+
+ "wraith": {
+            "name" : "wraith",
+            "speed" : 4,
+            "width": 70,
+            "height" : 70,
+            "images" : [
+            
+  { "link" : "wraith_blue.png", "color":"blue"},
+  { "link" : "wraith_green.png", "color":"green"},
+  { "link" : "wraith_red.png", "color":"red"},
+  { "link" : "wraith_yellow.png", "color":"yellow"},
+  { "link" : "wraith_purple.png", "color":"purple"},
+
+            ]
+        } ,
+
+ "magic_sword": {
+            "name" : "magic_sword",
+            "speed" : 4,
+            "width": 70,
+            "height" : 70,
+            "images" : [
+            
+  { "link" : "magic_sword_blue.png", "color":"blue"},
+  { "link" : "magic_sword_green.png", "color":"green"},
+  { "link" : "magic_sword_red.png", "color":"red"},
+  { "link" : "magic_sword_yellow.png", "color":"yellow"},
+  { "link" : "magic_sword_purple.png", "color":"purple"},
+  { "link" : "magic_sword_white.png", "color":"white"},
+  { "link" : "magic_sword_black.png", "color":"black"},
+
+            ]
+        } ,
+
+ "chicken": {
+            "name" : "chicken",
+            "speed" : 2,
+            "width": 70,
+            "height" : 70,
+            "images" : [
+            
+  { "link" : "chicken_blue.png", "color":"blue"},
+  { "link" : "chicken_green.png", "color":"green"},
+  { "link" : "chicken_yellow.png", "color":"yellow"},
+  { "link" : "chicken_purple.png", "color":"purple"},
+  { "link" : "chicken_white.png", "color":"white"},
+
+            ]
+        } ,
+
+ "blob": {
+            "name" : "blob",
+            "speed" : 2,
+            "width": 70,
+            "height" : 70,
+            "images" : [
+            
+  { "link" : "blob_blue.png", "color":"blue"},
+  { "link" : "blob_green.png", "color":"green"},
+  { "link" : "blob_yellow.png", "color":"yellow"},
+  { "link" : "blob_purple.png", "color":"purple"},
+  { "link" : "blob_white.png", "color":"white"},
+  { "link" : "blob_black.png", "color":"black"},
+  { "link" : "blob_red.png", "color":"red"},
+
+            ]
+        } ,
+
+}

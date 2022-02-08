@@ -1,0 +1,192 @@
+		
+		
+		<html>
+ <head>
+  <script type="text/javascript">
+   window.onload = function() {
+   
+   var cy = cytoscape({
+  container: document.getElementById('canvas'),
+  
+  style: [
+    {
+        selector: 'node',
+        style: {
+            label: 'data(id)'
+        }
+    }, {
+		selector:"edge",
+		style:{
+		"curve-style":"straight",
+			"mid-target-arrow-color":"red",
+			"mid-target-arrow-shape":"triangle",
+			"target-arrow-color":"red",
+			"target-arrow-shape":"triangle"			
+		}
+	
+	}]
+	
+});
+
+var eles = cy.add([
+{ group: 'nodes', data: { id: 'x5 portal key' }, position: { x: 31.372549019607842, y: 386.7142793218121 } },
+				{ group: 'nodes', data: { id: 'x15 item misc' }, position: { x: 62.745098039215684, y: 387.39676159683756 } },
+				{ group: 'nodes', data: { id: 'x18 item misc' }, position: { x: 94.11764705882352, y: 133.6344459931612 } },
+				{ group: 'nodes', data: { id: 'x25 item misc' }, position: { x: 125.49019607843137, y: 270.44900183977836 } },
+				{ group: 'nodes', data: { id: 'x30 item misc' }, position: { x: 156.8627450980392, y: 293.0863744369344 } },
+				{ group: 'nodes', data: { id: 'x34 item misc' }, position: { x: 188.23529411764704, y: 277.23616244624776 } },
+				{ group: 'nodes', data: { id: 'x4 monster misc' }, position: { x: 219.6078431372549, y: 121.88910882722683 } },
+				{ group: 'nodes', data: { id: 'x33 monster misc' }, position: { x: 250.98039215686273, y: 214.64728652282355 } },
+				{ group: 'nodes', data: { id: 'x37 monster misc' }, position: { x: 282.35294117647055, y: 480.3358552469663 } },
+				{ group: 'nodes', data: { id: 'x24 monster key' }, position: { x: 313.7254901960784, y: 503.2219346556312 } },
+				{ group: 'nodes', data: { id: 'x27 npc misc' }, position: { x: 345.09803921568624, y: 232.86184201435353 } },
+				{ group: 'nodes', data: { id: 'x0 portal key' }, position: { x: 376.4705882352941, y: 414.4080318678514 } },
+				{ group: 'nodes', data: { id: 'x12 chest misc' }, position: { x: 407.84313725490193, y: 360.35790493964726 } },
+				{ group: 'nodes', data: { id: 'x2 npc misc' }, position: { x: 439.2156862745098, y: 730.49590368305 } },
+				{ group: 'nodes', data: { id: 'x46 item misc' }, position: { x: 470.5882352941176, y: 712.4213974645971 } },
+				{ group: 'nodes', data: { id: 'x40 item misc' }, position: { x: 501.96078431372547, y: 746.2468838026018 } },
+				{ group: 'nodes', data: { id: 'x9 npc misc' }, position: { x: 533.3333333333333, y: 562.3059357842305 } },
+				{ group: 'nodes', data: { id: 'x7 npc misc' }, position: { x: 564.7058823529411, y: 457.4395893166129 } },
+				{ group: 'nodes', data: { id: 'x26 npc key' }, position: { x: 596.078431372549, y: 499.1232724529761 } },
+				{ group: 'nodes', data: { id: 'x36 monster misc' }, position: { x: 627.4509803921568, y: 483.7974539346255 } },
+				{ group: 'nodes', data: { id: 'x14 monster misc' }, position: { x: 658.8235294117646, y: 490.5215412829412 } },
+				{ group: 'nodes', data: { id: 'x35 monster misc' }, position: { x: 690.1960784313725, y: 108.07707130842839 } },
+				{ group: 'nodes', data: { id: 'x8 portal key' }, position: { x: 721.5686274509803, y: 314.4520490809404 } },
+				{ group: 'nodes', data: { id: 'x44 monster misc' }, position: { x: 752.9411764705882, y: 323.6610518537779 } },
+				{ group: 'nodes', data: { id: 'x42 npc key' }, position: { x: 784.313725490196, y: 247.09191751342456 } },
+				{ group: 'nodes', data: { id: 'x39 npc misc' }, position: { x: 815.6862745098039, y: 669.800362465203 } },
+				{ group: 'nodes', data: { id: 'x47 chest misc' }, position: { x: 847.0588235294117, y: 259.1894015141287 } },
+				{ group: 'nodes', data: { id: 'x31 npc misc' }, position: { x: 878.4313725490196, y: 339.5144196058931 } },
+				{ group: 'nodes', data: { id: 'x45 npc misc' }, position: { x: 909.8039215686274, y: 139.64119351484132 } },
+				{ group: 'nodes', data: { id: 'x21 npc misc' }, position: { x: 941.1764705882352, y: 296.5562072630906 } },
+				{ group: 'nodes', data: { id: 'x19 monster misc' }, position: { x: 972.5490196078431, y: 557.7413292387407 } },
+				{ group: 'nodes', data: { id: 'x29 monster key' }, position: { x: 1003.9215686274509, y: 269.69920722237543 } },
+				{ group: 'nodes', data: { id: 'x41 portal key' }, position: { x: 1035.2941176470588, y: 736.262813868047 } },
+				{ group: 'nodes', data: { id: 'x10 chest misc' }, position: { x: 1066.6666666666665, y: 578.7616684668844 } },
+				{ group: 'nodes', data: { id: 'x16 item misc' }, position: { x: 1098.0392156862742, y: 574.1943290244585 } },
+				{ group: 'nodes', data: { id: 'x6 monster misc' }, position: { x: 1129.411764705882, y: 687.5388826983396 } },
+				{ group: 'nodes', data: { id: 'x43 monster misc' }, position: { x: 1160.7843137254897, y: 643.1928987570881 } },
+				{ group: 'nodes', data: { id: 'x3 npc misc' }, position: { x: 1192.1568627450974, y: 457.8087310075961 } },
+				{ group: 'nodes', data: { id: 'x32 npc misc' }, position: { x: 1223.5294117647052, y: 601.9120630954123 } },
+				{ group: 'nodes', data: { id: 'x1 monster misc' }, position: { x: 1254.901960784313, y: 238.40164833195772 } },
+				{ group: 'nodes', data: { id: 'x22 monster key' }, position: { x: 1286.2745098039206, y: 103.84888245473304 } },
+				{ group: 'nodes', data: { id: 'x48 chest misc' }, position: { x: 1317.6470588235284, y: 423.56459305940194 } },
+				{ group: 'nodes', data: { id: 'x23 monster key' }, position: { x: 1349.019607843136, y: 254.85966417847538 } },
+				{ group: 'nodes', data: { id: 'x38 portal key' }, position: { x: 1380.3921568627438, y: 178.7831825109401 } },
+				{ group: 'nodes', data: { id: 'x17 item misc' }, position: { x: 1411.7647058823516, y: 273.34505479607765 } },
+				{ group: 'nodes', data: { id: 'x11 npc misc' }, position: { x: 1443.1372549019593, y: 376.46074786620414 } },
+				{ group: 'nodes', data: { id: 'x20 monster misc' }, position: { x: 1474.509803921567, y: 660.3968464989681 } },
+				{ group: 'nodes', data: { id: 'x28 monster misc' }, position: { x: 1505.8823529411748, y: 686.8802871767128 } },
+				{ group: 'nodes', data: { id: 'x13 monster key' }, position: { x: 1537.2549019607825, y: 313.05293027406935 } },
+				{ group: 'nodes', data: { id: 'x49 portal key' }, position: { x: 1568.6274509803902, y: 341.03945428334373 } },
+				 { group: 'edges', data: { id: 'x0 portal key x46 item misc', source: 'x0 portal key', target: 'x46 item misc' } },
+					 { group: 'edges', data: { id: 'x0 portal key x40 item misc', source: 'x0 portal key', target: 'x40 item misc' } },
+					 { group: 'edges', data: { id: 'x1 monster misc x22 monster key', source: 'x1 monster misc', target: 'x22 monster key' } },
+					 { group: 'edges', data: { id: 'x2 npc misc x9 npc misc', source: 'x2 npc misc', target: 'x9 npc misc' } },
+					 { group: 'edges', data: { id: 'x3 npc misc x32 npc misc', source: 'x3 npc misc', target: 'x32 npc misc' } },
+					 { group: 'edges', data: { id: 'x4 monster misc x39 npc misc', source: 'x4 monster misc', target: 'x39 npc misc' } },
+					 { group: 'edges', data: { id: 'x5 portal key x24 monster key', source: 'x5 portal key', target: 'x24 monster key' } },
+					 { group: 'edges', data: { id: 'x6 monster misc x3 npc misc', source: 'x6 monster misc', target: 'x3 npc misc' } },
+					 { group: 'edges', data: { id: 'x7 npc misc x36 monster misc', source: 'x7 npc misc', target: 'x36 monster misc' } },
+					 { group: 'edges', data: { id: 'x7 npc misc x14 monster misc', source: 'x7 npc misc', target: 'x14 monster misc' } },
+					 { group: 'edges', data: { id: 'x7 npc misc x35 monster misc', source: 'x7 npc misc', target: 'x35 monster misc' } },
+					 { group: 'edges', data: { id: 'x8 portal key x41 portal key', source: 'x8 portal key', target: 'x41 portal key' } },
+					 { group: 'edges', data: { id: 'x8 portal key x39 npc misc', source: 'x8 portal key', target: 'x39 npc misc' } },
+					 { group: 'edges', data: { id: 'x9 npc misc x17 item misc', source: 'x9 npc misc', target: 'x17 item misc' } },
+					 { group: 'edges', data: { id: 'x9 npc misc x35 monster misc', source: 'x9 npc misc', target: 'x35 monster misc' } },
+					 { group: 'edges', data: { id: 'x10 chest misc x1 monster misc', source: 'x10 chest misc', target: 'x1 monster misc' } },
+					 { group: 'edges', data: { id: 'x10 chest misc x6 monster misc', source: 'x10 chest misc', target: 'x6 monster misc' } },
+					 { group: 'edges', data: { id: 'x11 npc misc x13 monster key', source: 'x11 npc misc', target: 'x13 monster key' } },
+					 { group: 'edges', data: { id: 'x11 npc misc x20 monster misc', source: 'x11 npc misc', target: 'x20 monster misc' } },
+					 { group: 'edges', data: { id: 'x11 npc misc x28 monster misc', source: 'x11 npc misc', target: 'x28 monster misc' } },
+					 { group: 'edges', data: { id: 'x11 npc misc x49 portal key', source: 'x11 npc misc', target: 'x49 portal key' } },
+					 { group: 'edges', data: { id: 'x12 chest misc x38 portal key', source: 'x12 chest misc', target: 'x38 portal key' } },
+					 { group: 'edges', data: { id: 'x12 chest misc x23 monster key', source: 'x12 chest misc', target: 'x23 monster key' } },
+					 { group: 'edges', data: { id: 'x13 monster key x49 portal key', source: 'x13 monster key', target: 'x49 portal key' } },
+					 { group: 'edges', data: { id: 'x14 monster misc x28 monster misc', source: 'x14 monster misc', target: 'x28 monster misc' } },
+					 { group: 'edges', data: { id: 'x14 monster misc x42 npc key', source: 'x14 monster misc', target: 'x42 npc key' } },
+					 { group: 'edges', data: { id: 'x14 monster misc x10 chest misc', source: 'x14 monster misc', target: 'x10 chest misc' } },
+					 { group: 'edges', data: { id: 'x15 item misc x14 monster misc', source: 'x15 item misc', target: 'x14 monster misc' } },
+					 { group: 'edges', data: { id: 'x16 item misc x43 monster misc', source: 'x16 item misc', target: 'x43 monster misc' } },
+					 { group: 'edges', data: { id: 'x17 item misc x11 npc misc', source: 'x17 item misc', target: 'x11 npc misc' } },
+					 { group: 'edges', data: { id: 'x18 item misc x27 npc misc', source: 'x18 item misc', target: 'x27 npc misc' } },
+					 { group: 'edges', data: { id: 'x18 item misc x4 monster misc', source: 'x18 item misc', target: 'x4 monster misc' } },
+					 { group: 'edges', data: { id: 'x19 monster misc x29 monster key', source: 'x19 monster misc', target: 'x29 monster key' } },
+					 { group: 'edges', data: { id: 'x19 monster misc x41 portal key', source: 'x19 monster misc', target: 'x41 portal key' } },
+					 { group: 'edges', data: { id: 'x20 monster misc x13 monster key', source: 'x20 monster misc', target: 'x13 monster key' } },
+					 { group: 'edges', data: { id: 'x21 npc misc x19 monster misc', source: 'x21 npc misc', target: 'x19 monster misc' } },
+					 { group: 'edges', data: { id: 'x22 monster key x48 chest misc', source: 'x22 monster key', target: 'x48 chest misc' } },
+					 { group: 'edges', data: { id: 'x23 monster key x38 portal key', source: 'x23 monster key', target: 'x38 portal key' } },
+					 { group: 'edges', data: { id: 'x24 monster key x12 chest misc', source: 'x24 monster key', target: 'x12 chest misc' } },
+					 { group: 'edges', data: { id: 'x25 item misc x37 monster misc', source: 'x25 item misc', target: 'x37 monster misc' } },
+					 { group: 'edges', data: { id: 'x26 npc key x8 portal key', source: 'x26 npc key', target: 'x8 portal key' } },
+					 { group: 'edges', data: { id: 'x26 npc key x44 monster misc', source: 'x26 npc key', target: 'x44 monster misc' } },
+					 { group: 'edges', data: { id: 'x26 npc key x42 npc key', source: 'x26 npc key', target: 'x42 npc key' } },
+					 { group: 'edges', data: { id: 'x27 npc misc x2 npc misc', source: 'x27 npc misc', target: 'x2 npc misc' } },
+					 { group: 'edges', data: { id: 'x28 monster misc x13 monster key', source: 'x28 monster misc', target: 'x13 monster key' } },
+					 { group: 'edges', data: { id: 'x29 monster key x10 chest misc', source: 'x29 monster key', target: 'x10 chest misc' } },
+					 { group: 'edges', data: { id: 'x30 item misc x33 monster misc', source: 'x30 item misc', target: 'x33 monster misc' } },
+					 { group: 'edges', data: { id: 'x30 item misc x37 monster misc', source: 'x30 item misc', target: 'x37 monster misc' } },
+					 { group: 'edges', data: { id: 'x31 npc misc x21 npc misc', source: 'x31 npc misc', target: 'x21 npc misc' } },
+					 { group: 'edges', data: { id: 'x32 npc misc x1 monster misc', source: 'x32 npc misc', target: 'x1 monster misc' } },
+					 { group: 'edges', data: { id: 'x33 monster misc x36 monster misc', source: 'x33 monster misc', target: 'x36 monster misc' } },
+					 { group: 'edges', data: { id: 'x34 item misc x22 monster key', source: 'x34 item misc', target: 'x22 monster key' } },
+					 { group: 'edges', data: { id: 'x35 monster misc x1 monster misc', source: 'x35 monster misc', target: 'x1 monster misc' } },
+					 { group: 'edges', data: { id: 'x36 monster misc x19 monster misc', source: 'x36 monster misc', target: 'x19 monster misc' } },
+					 { group: 'edges', data: { id: 'x36 monster misc x44 monster misc', source: 'x36 monster misc', target: 'x44 monster misc' } },
+					 { group: 'edges', data: { id: 'x37 monster misc x24 monster key', source: 'x37 monster misc', target: 'x24 monster key' } },
+					 { group: 'edges', data: { id: 'x37 monster misc x8 portal key', source: 'x37 monster misc', target: 'x8 portal key' } },
+					 { group: 'edges', data: { id: 'x37 monster misc x27 npc misc', source: 'x37 monster misc', target: 'x27 npc misc' } },
+					 { group: 'edges', data: { id: 'x37 monster misc x46 item misc', source: 'x37 monster misc', target: 'x46 item misc' } },
+					 { group: 'edges', data: { id: 'x37 monster misc x0 portal key', source: 'x37 monster misc', target: 'x0 portal key' } },
+					 { group: 'edges', data: { id: 'x38 portal key x17 item misc', source: 'x38 portal key', target: 'x17 item misc' } },
+					 { group: 'edges', data: { id: 'x39 npc misc x47 chest misc', source: 'x39 npc misc', target: 'x47 chest misc' } },
+					 { group: 'edges', data: { id: 'x39 npc misc x31 npc misc', source: 'x39 npc misc', target: 'x31 npc misc' } },
+					 { group: 'edges', data: { id: 'x40 item misc x6 monster misc', source: 'x40 item misc', target: 'x6 monster misc' } },
+					 { group: 'edges', data: { id: 'x40 item misc x26 npc key', source: 'x40 item misc', target: 'x26 npc key' } },
+					 { group: 'edges', data: { id: 'x41 portal key x16 item misc', source: 'x41 portal key', target: 'x16 item misc' } },
+					 { group: 'edges', data: { id: 'x42 npc key x41 portal key', source: 'x42 npc key', target: 'x41 portal key' } },
+					 { group: 'edges', data: { id: 'x42 npc key x10 chest misc', source: 'x42 npc key', target: 'x10 chest misc' } },
+					 { group: 'edges', data: { id: 'x43 monster misc x32 npc misc', source: 'x43 monster misc', target: 'x32 npc misc' } },
+					 { group: 'edges', data: { id: 'x44 monster misc x43 monster misc', source: 'x44 monster misc', target: 'x43 monster misc' } },
+					 { group: 'edges', data: { id: 'x45 npc misc x29 monster key', source: 'x45 npc misc', target: 'x29 monster key' } },
+					 { group: 'edges', data: { id: 'x46 item misc x7 npc misc', source: 'x46 item misc', target: 'x7 npc misc' } },
+					 { group: 'edges', data: { id: 'x47 chest misc x45 npc misc', source: 'x47 chest misc', target: 'x45 npc misc' } },
+					 { group: 'edges', data: { id: 'x47 chest misc x11 npc misc', source: 'x47 chest misc', target: 'x11 npc misc' } },
+					 { group: 'edges', data: { id: 'x48 chest misc x23 monster key', source: 'x48 chest misc', target: 'x23 monster key' } },
+					]);
+
+
+cy.resize();
+
+cy.mount()
+   };
+  </script>
+  
+  <style>
+    #canvas {
+        width: 1600;
+        height: 750;
+        position: absolute;
+        top: 0px;
+        left: 0px;
+    }
+</style>
+
+
+ </head>
+ 
+ <body>
+  <div id="canvas"></div>
+   <div>
+        </div>
+	
+			<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.15.2/cytoscape.min.js"></script>
+			
+			
+			<script type="text/javascript" src="a.js"></script>
+ </body>
+</html>
+
+
+
