@@ -102,8 +102,11 @@ class App extends React.Component {
 		this.setState({mode:"game"})
 	}
 	back(){
-		if(window.confirm("Are you sure?")){
+		if(this.state.mode !== "win" && window.confirm("Are you sure?")){
 			this.setState({mode:"menu"})
+		}
+		if(this.state.mode == "win"){
+			this.setState({mode:"menu"});
 		}
 	}
 	win(time, sort,times){

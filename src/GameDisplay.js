@@ -89,7 +89,7 @@ class GameDisplay extends React.Component {
 		<canvas width={990} height={600} id="lowerCanvas" style={{position:"absolute", top:80, left:0, zIndex:0}} ref={this.lowerCanvas}/>
 		<canvas width={990} height={600} id="upperCanvas" style={{position:"absolute", top:80, left:0, zIndex:1, border:"1px solid black"}}ref={this.upperCanvas}/>
 		<canvas width={990} height={600} id="playerCanvas" style={{position:"absolute", top:80, left:0, zIndex:2, border:"1px solid black"}}ref={this.playerCanvas}/>
-		<canvas width={990} height={600} id="itemCanvas" style={{position:"absolute", top:80, left:990, zIndex:2}} ref={this.itemCanvas}/>
+		<canvas width={90} height={600} id="itemCanvas" style={{position:"absolute", top:80, left:1005, zIndex:2}} ref={this.itemCanvas}/>
 		<canvas width={80} height={80} id="mapCanvas" style={{position:"absolute", top:80, left:910, zIndex:3, border:"1px solid black", display : this.showMap ? "" : "none"}}ref={this.mapCanvas}/>
 
 		<canvas width={720} height={45} ref={this.inventoryCanvas} onMouseMove = {this.mouseOverInv} id="inventoryCanvas" style={{position:"absolute", top:690, left:70,  border:"1px solid black", zIndex:0}} />
@@ -99,9 +99,9 @@ class GameDisplay extends React.Component {
 		<img src={require("./images/scroll_right.png")} onMouseOver = {function(){this.inventoryScrollDirection="right"}.bind(this)} onMouseOut = {function(){this.inventoryScrollDirection=undefined}.bind(this)} id="scrollRight" style={{position:"absolute", top:690, left:800,  border:"1px solid black", zIndex:0}} />
 
 		
-		<button  onClick={this.back} id="backButton" style={{position:"absolute", top:690, left:850, width:100 ,height:30 ,border:"1px solid black", zIndex:0}}>Back</button>
-		<button  onClick={this.hint} id="backButton" style={{position:"absolute", top:720, left:850, width:100 ,height:30 ,border:"1px solid black", zIndex:0}}>I'm stuck</button>
-		<button  onClick={function(){this.showMap = !this.showMap; this.forceUpdate()}.bind(this)} id="backButton" style={{position:"absolute", top:750, left:850, width:100 ,height:30 ,border:"1px solid black", zIndex:0}}>Toggle map</button>
+		<button  onClick={this.back} id="backButton" style={{position:"absolute", top:690, left:850, width:100 ,height:20 ,border:"1px solid black", zIndex:0}}>Back</button>
+		<button  onClick={this.hint} id="backButton" style={{position:"absolute", top:710, left:850, width:100 ,height:20 ,border:"1px solid black", zIndex:0}}>I'm stuck</button>
+		<button  onClick={function(){this.showMap = !this.showMap; this.forceUpdate()}.bind(this)} id="backButton" style={{position:"absolute", top:730, left:850, width:100 ,height:20 ,border:"1px solid black", zIndex:0}}>Toggle map</button>
 		</div>
 	  );
 	}
