@@ -1,5 +1,5 @@
 class room{ // part of gameData
-    constructor(name,entities,walls,imgs,reqImgs, monsters, drops, background, speed=1.5){
+    constructor(name,entities,walls,imgs,reqImgs, monsters, drops, background, speed=1.5, map=undefined){
 		if(Array.isArray(monsters)){
 			monsters = new Set(monsters);
 		}
@@ -30,6 +30,7 @@ class room{ // part of gameData
 		this.monsters = monsters; // set of triples: startX, startY, monster
 		this.drops = drops; // set of items, added when monsters are all killed
 		this.speed = speed; // monster speed, in pixels per frame
+		this.map = map; // map that this is a part of (as a string)
     }
 }
 export default room

@@ -1,4 +1,4 @@
-class gameData{
+class gameData{ // maps is not part of gameData as it's not used in game, only used for display purposes. 
     constructor(rooms,items, finalRoom){
 		if(rooms[finalRoom] == undefined){
 			throw new Error("gameData without final room");

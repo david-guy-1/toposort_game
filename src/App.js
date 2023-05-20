@@ -6,7 +6,7 @@ import React from 'react';
 import makeDag from './makeDag';
 import {getImageForItem, loadAll} from "./itemPool.js"
 import {sha256} from "./random.js";
-const cytoscape = require("C:/Users/theleader/AppData/Roaming/npm/node_modules/cytoscape");
+const cytoscape = require("cytoscape");
 const _ = require("lodash");
 
 class App extends React.Component {
@@ -81,12 +81,14 @@ class App extends React.Component {
 		this.itemHeldBy = compileResult[3];
 		this.dictionary = compileResult[2];
 		this.hintStrings = compileResult[4];
+		this.maps = compileResult[5]; 
+		this.portalRooms = compileResult[6]; 
 		this.reverseDictionary = [];
 		for(var key of Object.keys(this.dictionary)){
 			this.reverseDictionary[this.dictionary[key]] = key;
 		}
 		this.dag = compileResult[1];
-		this.game = new game(compileResult[0], this.dag, this.reverseDictionary, this.hintStrings);
+		this.game = new game(compileResult[0], this.dag, this.reverseDictionary, this.hintStrings, this.maps);
 		
 		
 		// DEBUG!!!
@@ -215,7 +217,7 @@ class App extends React.Component {
 			break;
 			case "game":
 			return <div>
-			<GameDisplay dag_={this.dag} game={this.game} back={this.back} win={this.win} seed={this.seed} size={this.size}/>
+			<GameDisplay dag_={this.dag} game={this.game} back={this.back} win={this.win} seed={this.seed} size={this.size} maps={this.maps} portalRooms={this.portalRooms}/>
 				
 			</div>
 			break;
@@ -238,8 +240,8 @@ class App extends React.Component {
 			case "graph":
 				return <div>
 				<div ref={this.graphRef} style={{position:"absolute", top:10, left:10, width:1000, height:650}} ></div> 
-				<div style={{position:"absolute", top:660, left:100, width:150, height:40}} onClick={this.back} onClick={() => this.setState({mode : "win"})}>You can drag things with your mouse</div>
-				<button style={{position:"absolute", top:660, left:500, width:150, height:40}} onClick={this.back} onClick={() => this.setState({mode : "win"})}>Go back</button>
+				<div style={{position:"absolute", top:660, left:100, width:150, height:40}} >You can drag things with your mouse</div>
+				<button style={{position:"absolute", top:660, left:500, width:150, height:40}}onClick={() => this.setState({mode : "win"})}>Go back</button>
 				</div>
 			break;
 			case "sort":

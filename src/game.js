@@ -4,8 +4,9 @@ import * as l from "./lines.js"
 const _ = require("lodash");
 
 class game{
-	constructor(gd, dag, reverseDict, hintStrings){
+	constructor(gd, dag, reverseDict, hintStrings, maps){
 		this.gameData = _.cloneDeep(gd);
+		this.maps = maps;
 		// setify the items;
 		for(var key of Object.keys(this.gameData.items)){
 			if(Array.isArray(this.gameData.items[key] )){
@@ -20,7 +21,7 @@ class game{
 		this.lastEnteredTime = Date.now();
 		this.sort = [];
 		this.times = [];
-		this.current = "root";
+		this.currentRoom = "root";
 		this.canvasTL = [30,80]
 		this.inventory = new Set();// pairs. just the name and image. no x or y coords
 		this.items = this.gameData.items; // hash table of name of room -> set of items
@@ -32,6 +33,39 @@ class game{
 		this.dag = dag;
 		this.reverseDict = reverseDict;
 		this.hintStrings = hintStrings;
+	}
+	isRoomCompleted(room){
+		var roomObj = this.gameData.rooms[room]
+		var inventoryNames = [...this.inventory].map((x) => x[0]);
+		if(this.items[room].size !== 0){ // did not pick up item
+			return false;
+		}
+		if(roomObj.monsters.size !== 0 && this.completedMonsters.has(room) === false){ // monster not killed
+			return false 
+		}
+		var roomEntities = this.gameData.rooms[room].entities;
+		for(var entity of roomEntities){
+			switch(entity.type){
+				case "chest":
+					if(this.completedEntities.has(entity.name) == false){
+						return false; 
+					}
+				break;
+				case "npc":
+					// for each item it can drop, see if it's in the inventory
+					// if not, then this room is not done yet
+					var drops = entity.data.flatMap((x) => x.items);
+					
+					for(var item of drops){
+						// npc drops item that we don't have yet
+						if(inventoryNames.indexOf(item.name) == -1 ){
+							return false; 
+						}
+					}
+				break;
+			}
+		}
+		return true;
 	}
 	// get vertices that can be reached immediately
 	getExposedVertices(){
@@ -49,8 +83,8 @@ class game{
 	}
 	computeLevel(x,y){
 		// compute level based on the image and provided x and y
-		var room = this.gameData.rooms[this.current];
-		var items = this.items[this.current];
+		var room = this.gameData.rooms[this.currentRoom];
+		var items = this.items[this.currentRoom];
 		var walls = room.walls;
 		var entities = l.filter(room.entities,function(x){return !this.completedEntities.has(x.name)}.bind(this));
 		//// list of triples: startX, startY, monster
@@ -65,7 +99,7 @@ class game{
 	//returns a single string completely saying where the player is in the dungeon.
 	// used for rendering background
 	getLocation(){
-		return this.current;
+		return this.currentRoom;
 	}
 	tick(mouseX, mouseY, mouseDown){
 		/*
@@ -85,7 +119,7 @@ class game{
 		this.getLevel().moveToPoint(mouseX-this.canvasTL[0], mouseY-this.canvasTL[1], 20 + Math.random() * 1);
 		var a = this.pickUpItems();
 		var b = this.activateEntities();
-		this.level.monsterStep(this.gameData.rooms[this.current].speed + Math.random() * 0.1);
+		this.level.monsterStep(this.gameData.rooms[this.currentRoom].speed + Math.random() * 0.1);
 		var now = Date.now();
 		var c = undefined
 		var attackedThisTick = false;
@@ -104,6 +138,7 @@ class game{
 			"entitiesActivated" : b[0],
 			"entitiesFailed" : b[1],
 			"npcChat" : b[2],
+			"npcShowItems" : b[3],
 			"monstersAttacked" : c == undefined ? [] : c[0],
 			"monstersFailed" : c == undefined ? [] : c[1],
 			"newRoom"  : d,
@@ -119,7 +154,7 @@ class game{
 			this.inventory.add([item.name, item.image]);
 			this.sort.push(item.name);
 			this.times.push(Date.now()-this.startTime);
-			this.items[this.current].delete(item);
+			this.items[this.currentRoom].delete(item);
 			items_picked_up.push(item);
 		}
 		return items_picked_up;
@@ -151,6 +186,7 @@ class game{
 		var activated = [];
 		var failed = [];
 		var npcChat  = [];
+		var npcShowItems = [];
 		for(var entity of entities){
 			// don't meet requirements? continue;
 			if(!this.meetRequirements(entity.reqs)){
@@ -162,7 +198,7 @@ class game{
 				case "chest":
 					// open the chest;
 					this.completedEntities.add(entity.name)
-					this.items[this.current] = l.union(this.items[this.current], entity.data)
+					this.items[this.currentRoom] = l.union(this.items[this.currentRoom], entity.data)
 				break;
 				case "portal":
 					if(Date.now() - this.lastEnteredTime  > 500){
@@ -173,13 +209,17 @@ class game{
 					var thing = entity.data;
 					for(var thing2 of thing){
 						// thing2 = {requirements, displayString, items}
+						// the first one in the list gets activated. 
 						if(this.meetRequirements(thing2.requirements)){
 							// activate!
 							npcChat.push(thing2.displayString);
+							if(thing2.showItems.length != 0){
+								npcShowItems = thing2.showItems; // new ones override old ones
+							}
 							for(var item of thing2.items){
 								if(!this.completedEntities.has(entity.name + item.name)){
 									this.completedEntities.add(entity.name + item.name)
-									this.items[this.current].add(item)
+									this.items[this.currentRoom].add(item)
 								}
 							}
 							break;
@@ -188,11 +228,11 @@ class game{
 				break;
 			}
 		}
-		return [activated, failed, npcChat];
+		return [activated, failed, npcChat, npcShowItems];
 	}
 	
 	attack(){
-		var room = this.gameData.rooms[this.current];
+		var room = this.gameData.rooms[this.currentRoom];
 		var indices = this.level.attack();
 		var monsters = this.level.getMonsters();
 		var attacked = [];
@@ -206,27 +246,27 @@ class game{
 			} else {
 				failed.push(i);
 			}
-			if(this.level.allDead() && !this.completedMonsters.has(this.current)){
-				this.completedMonsters.add(this.current);
-				this.items[this.current] = l.union(this.items[this.current], room.drops)
+			if(this.level.allDead() && !this.completedMonsters.has(this.currentRoom)){
+				this.completedMonsters.add(this.currentRoom);
+				this.items[this.currentRoom] = l.union(this.items[this.currentRoom], room.drops)
 			}
 		}
 		return [attacked , failed]
 	}
 	
 	synchronize(){
-		var room = this.gameData.rooms[this.current];
+		var room = this.gameData.rooms[this.currentRoom];
 		if(this.nextLocation != undefined){
-			this.current = this.nextLocation[0];
+			this.currentRoom = this.nextLocation[0];
 			this.level = this.computeLevel(this.nextLocation[1], this.nextLocation[2]);
 			this.nextLocation = undefined;
 			this.lastEnteredTime = Date.now();
-			return this.current;
+			return this.currentRoom;
 		} else {
 			var entities = l.filter(room.entities,function(x){return !this.completedEntities.has(x.name)}.bind(this));
 		//// list of triples: startX, startY, monster
 			this.level.entities = entities;
-			this.level.items = this.items[this.current];
+			this.level.items = this.items[this.currentRoom];
 			return undefined;
 		}
 	}

@@ -13,6 +13,7 @@ import * as P from "./itemPool.js";
 import themeData from "./themeData.js";
 import {getProportions, interpret} from "./interpret.js";
 import {allHintStrings, addHintStrings} from "./hintStrings.js";
+import map from "./map.js"
 
 const _ = require("lodash");
 
@@ -451,7 +452,7 @@ function makeItemData(type, theme, seed){ // some other data might be needed
 // if makeItemData is not called using "monster", we can use it here 
 //use makeItemData stuff to make 
 // returns a pair of info.type == portal (for unopened and opened)
-function getImage(info){ // some other data might be needed
+export function getImage(info){ // some other data might be needed
 	switch(info.type){
 		case "chest":
 			return "./images/chests/" + info.image
@@ -516,8 +517,9 @@ export function compileOne(dag, name, renderThese, assumeHas,dict,interpretation
 	while(result == undefined || result.size < 4){
 		counter++;
 		var maze = generateMaze(size, size, last ? 0.3 : 0.6, seed + " generate maze" + name + " " + counter);
-		result = bfs(size, size, maze, start, start)[0]; 
+		result = bfs(size, size, maze, start, start)[0]; // mazes are square, and start in the middle  
 	}
+	var thisMap = new map(maze, [dungeonSize, dungeonSize], name  + " map");
 	////console.log(result.size)
 	// turn the maze into walledRoom
 	for(var point of result){
@@ -548,6 +550,7 @@ export function compileOne(dag, name, renderThese, assumeHas,dict,interpretation
 		}
 		rooms[name + " " + x + " " + y] = walledRoom(name + " " + x + " " + y, moves[0], moves[1], moves[2], moves[3], theme.name, seed + " walled room" + point)
 		items[name + " " + x + " " + y] = [];
+		thisMap.addRoom(x, y, rooms[name + " " + x + " " + y]); 
 	}
 	var vertexList = dag.get_vertices();
 	// used or unused
@@ -558,7 +561,7 @@ export function compileOne(dag, name, renderThese, assumeHas,dict,interpretation
 	var used = new Set()
 	//do not render any items for the last vertex
 	if(last){
-		return [rooms, items, dictionary, unused, {}, {}];
+		return [rooms, items, dictionary, unused, {}, {}, thisMap];
 	}
 	// all vertex lists are names (strings) not vertex objects
 	
@@ -718,7 +721,7 @@ export function compileOne(dag, name, renderThese, assumeHas,dict,interpretation
 				
 				var entityName = roomToAdd + " npc " + rooms[roomToAdd].entities.size
 				
-				var npcData = [{"requirements": [itemToAdd.name] , "displayString" : "You have already activated this statue", "items":[]},{"requirements" : reqString, "displayString" : "You activate the statue, it drops an item", items:[itemToAdd]},{"requirements" : [], "displayString" : processString("This statue is activated by $1", reqString), "items":[]}];
+				var npcData = [{"requirements": [itemToAdd.name] , "displayString" : "You have already activated this statue", "items":[], showItems : []},{"requirements" : reqString, "displayString" : "You activate the statue, it drops an item", items:[itemToAdd], showItems : []},{"requirements" : [], "displayString" : processString("This statue is activated by $1", reqString), "items":[], showItems : reqString}];
 				
 				var inst = new entity(entityName, "npc",  locationNPC[0]-20, locationNPC[1]-20, locationNPC[0]-20 + thisHolderData.width, locationNPC[1]-20 + thisHolderData.height, "", npcData, [], thisHolderImage);
 				rooms[roomToAdd].entities.add(inst);
@@ -731,7 +734,9 @@ export function compileOne(dag, name, renderThese, assumeHas,dict,interpretation
 		itemHeldBy[vertex].holderObj = inst;
 	}
 	
-	return [rooms, items,dictionary, unused, itemData, itemHeldBy];
+
+
+	return [rooms, items,dictionary, unused, itemData, itemHeldBy, thisMap];
 	
 }
 // returns all pairs (x, y) that are incomparable, and are in different chunks.
@@ -782,7 +787,9 @@ export function compile(dag, seed, name="compileNAME", chunkSizeMin = 6, chunkSi
 	var slices = [];
 	var themes = [];
 	var portals = []; // keys : source (entity inst ), destination (entity inst ), section (number). destination chunk number is always index+1	
+	var portalRooms = new Set(); // set of rooms that have portals in them 
 	var roomSizes = [];
+	var maps = {}; // key = name
 	for(var i=0; i<sort.length-1; i += randint(chunkSizeMin, chunkSizeMax+1, seed + "slicing " + i)){
 		slices.push(i)
 	}  
@@ -835,6 +842,7 @@ export function compile(dag, seed, name="compileNAME", chunkSizeMin = 6, chunkSi
 		unused.push(result[3])
 		addObject(itemData, result[4])
 		addObject(itemHeldBy, result[5])
+		addObject(maps, {[result[6].name] : result[6]})
 		//requirements for first object in chunk is also requirement for everything in the chunk
 		for(var vertex of things){
 			for(var vertex2 of firstPred){
@@ -890,6 +898,9 @@ export function compile(dag, seed, name="compileNAME", chunkSizeMin = 6, chunkSi
 			var destPortal = new entity("slice " + i + " portal end","portal", loc2[0], loc2[1], loc2[0]+portalDestData.width, loc2[1]+portalDestData.height,"",[room1Name, loc1[0]-30, loc1[1]-30], [], portalDestImages[1] );
 			rooms[room2Name].entities.add(destPortal)
 			
+			portalRooms.add(room1Name);
+			portalRooms.add(room2Name);
+
 			//record this portal in the list of portals
 			var room1Split = room1Name.split(" ");
 			var room2Split = room2Name.split(" ");
@@ -965,7 +976,7 @@ export function compile(dag, seed, name="compileNAME", chunkSizeMin = 6, chunkSi
 		var loc = chooseXY(room_, seed + " add sign " + counter)
 		loc[0] += randint(-50, -30, seed + " add sign shift x " + counter);
 		loc[1] += randint(-50, -30, seed + " add sign shift y " + counter);
-		var signEntity = new entity("sign entity " + room_ + " " + counter, "npc", loc[0], loc[1], loc[0]+80, loc[1]+80, "", [{"requirements":[dictionary[sign[2]]], "displayString" : "(You already have this)" + sign[1], "items":[]} ,{"requirements":[], "displayString" : sign[1], "items":[]} ],"", "./images/signpost.png");
+		var signEntity = new entity("sign entity " + room_ + " " + counter, "npc", loc[0], loc[1], loc[0]+80, loc[1]+80, "", [{"requirements":[dictionary[sign[2]]], "displayString" : "(You already have this)" + sign[1], "items":[], showItems : [] } ,{"requirements":[], "displayString" : sign[1], "items":[], showItems : [] } ],"", "./images/signpost.png");
 		rooms[room_].entities.add(signEntity);
 	}
 	var allHintStringsVar = allHintStrings(rooms, items, dictionary, itemData, itemHeldBy, themes, sort,portals, newDag, sort[sort.length-1],roomSizes, slices)
@@ -978,5 +989,5 @@ export function compile(dag, seed, name="compileNAME", chunkSizeMin = 6, chunkSi
 	rooms[finalRoomName].imgs.add(new img("./images/cage.png", 100, 100));
 	// add in monster
 	rooms[finalRoomName].monsters.add([600, 400, new monster("boss", "Anna must be here!", ["./images/boss.png","./images/boss_attack.png"], [],7, 150, 150)]);
-	return [new gameData(rooms, items, finalRoomName), newDag, dictionary, itemHeldBy,allHintStringsVar];
+	return [new gameData(rooms, items, finalRoomName), newDag, dictionary, itemHeldBy,allHintStringsVar, maps, portalRooms];
 }

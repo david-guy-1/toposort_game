@@ -3,10 +3,10 @@ import * as d from "./canvasDrawing.js";
 import game from "./game.js";
 import * as l from "./lines.js"
 //import data1 from "./data.js";
-import {compile} from "./compile.js";
+import {getImage} from "./compile.js";
 import dag from "./dag.js";
 import processString from "./processString.js";
-
+import {keyItems, miscItems} from "./itemPool.js";
 
 // tentative name : The Cave Rescue Adventure
 
@@ -15,12 +15,14 @@ class GameDisplay extends React.Component {
 		super(props);
 		// props is dag and game (game is gameData object)
 		this.state = {text_ : ""};
-		
+		console.log(keyItems.length);
 		this.lowerCanvas = React.createRef();
 		this.upperCanvas = React.createRef();
+		this.itemCanvas = React.createRef();
 		this.playerCanvas = React.createRef();
 		this.topCanvas = React.createRef();
 		this.inventoryCanvas = React.createRef();
+		this.mapCanvas = React.createRef();
 		
 		this.lastRendered = Date.now();
 		this.fps = 40;
@@ -33,6 +35,8 @@ class GameDisplay extends React.Component {
 		
 		this.dag_ = this.props.dag;
 		this.game = this.props.game;
+		this.maps = this.props.maps;
+		this.portalRooms = this.props.portalRooms;
 		this.back = this.props.back;
 		this.win = this.props.win;
 		this.mouseX = 0;
@@ -47,6 +51,8 @@ class GameDisplay extends React.Component {
 		this.damagedLastAttack = false;
 		this.attackedIndex = []; // indices of damaged monsters
 		this.invNames = [];
+		this.lastDisplayedItems = Date.now();
+		this.showMap = true; 
 		
 	}
 	mouseMove(e){
@@ -83,7 +89,9 @@ class GameDisplay extends React.Component {
 		<canvas width={990} height={600} id="lowerCanvas" style={{position:"absolute", top:80, left:0, zIndex:0}} ref={this.lowerCanvas}/>
 		<canvas width={990} height={600} id="upperCanvas" style={{position:"absolute", top:80, left:0, zIndex:1, border:"1px solid black"}}ref={this.upperCanvas}/>
 		<canvas width={990} height={600} id="playerCanvas" style={{position:"absolute", top:80, left:0, zIndex:2, border:"1px solid black"}}ref={this.playerCanvas}/>
-		
+		<canvas width={990} height={600} id="itemCanvas" style={{position:"absolute", top:80, left:990, zIndex:2}} ref={this.itemCanvas}/>
+		<canvas width={80} height={80} id="mapCanvas" style={{position:"absolute", top:80, left:910, zIndex:3, border:"1px solid black", display : this.showMap ? "" : "none"}}ref={this.mapCanvas}/>
+
 		<canvas width={720} height={45} ref={this.inventoryCanvas} onMouseMove = {this.mouseOverInv} id="inventoryCanvas" style={{position:"absolute", top:690, left:70,  border:"1px solid black", zIndex:0}} />
 		
 		<img src={require("./images/scroll_left.png")} onMouseOver = {function(){this.inventoryScrollDirection="left"}.bind(this)} onMouseOut = {function(){this.inventoryScrollDirection=undefined}.bind(this)} id="scrollLeft" style={{position:"absolute", top:690, left:20,  border:"1px solid black", zIndex:0}} />
@@ -93,6 +101,7 @@ class GameDisplay extends React.Component {
 		
 		<button  onClick={this.back} id="backButton" style={{position:"absolute", top:690, left:850, width:100 ,height:30 ,border:"1px solid black", zIndex:0}}>Back</button>
 		<button  onClick={this.hint} id="backButton" style={{position:"absolute", top:720, left:850, width:100 ,height:30 ,border:"1px solid black", zIndex:0}}>I'm stuck</button>
+		<button  onClick={function(){this.showMap = !this.showMap; this.forceUpdate()}.bind(this)} id="backButton" style={{position:"absolute", top:750, left:850, width:100 ,height:30 ,border:"1px solid black", zIndex:0}}>Toggle map</button>
 		</div>
 	  );
 	}
@@ -104,7 +113,27 @@ class GameDisplay extends React.Component {
 	displayText(t){
 		this.setState({text_ : t});
 	}
-   
+   	displayItems(lst){
+
+		var now = Date.now();
+		if(now - this.lastDisplayedItems  < 100){
+			return;
+		}
+		var ic2 = this.itemCanvas.current.getContext("2d");
+		ic2.clearRect(0,0,1000,1000);
+		
+		var inventoryNames = [...this.game.inventory].map((x) => x[0]);
+		this.lastDisplayedItems = now; 
+		var drawY = 10; 
+		for(var item of lst){
+			var itemPath = keyItems[item] == undefined ? getImage({"type":"misc", "image":miscItems[item].image})  : getImage({"type":"key", "image":keyItems[item].image}); 
+			d.drawImageStr(ic2 ,itemPath, 5, drawY);
+			if(inventoryNames.indexOf(item) !== -1){
+				d.drawImageStr(ic2,"./images/checkmark.png", 50, drawY);
+			}
+			drawY += 50;
+		}
+	}
 	
 	update(events){
 		/* eventList is an array of objects
@@ -116,13 +145,19 @@ class GameDisplay extends React.Component {
 		monstersFailed -> list of numbers (indices of monsters failed to attack)
 		newRoom -> new room (if applicable)
 		*/		
+		var now = Date.now();
 		var pc = this.playerCanvas.current.getContext("2d");
 		var uc = this.upperCanvas.current.getContext("2d");
 		var lc = this.lowerCanvas.current.getContext("2d");
 		var ic = this.inventoryCanvas.current.getContext("2d");
+		var mc = this.mapCanvas.current.getContext("2d");
+		var ic2 = this.itemCanvas.current.getContext("2d");
 		// clear everything
 		pc.clearRect(0,0,1000,1000);
 		uc.clearRect(0,0,1000,1000);
+		if(now - this.lastDisplayedItems  > 2000){
+			ic2.clearRect(0,0,1000,1000);
+		}
 		var level = this.game.getLevel();
 		//this.displayText("abcabcabcabcabcabcabcabcabcabcabcabcabcabcabcd")
 //d.drawImageStr(uc,"./images/green_potion.png", 400, 400);
@@ -206,6 +241,65 @@ class GameDisplay extends React.Component {
 			lc.clearRect(0,0,1000,1000);
 			d.drawImageStr(lc, level.background, 0, 0);
 		}
+
+		// draw the map 
+		for(var event_ of events){
+			if(event_.newRoom !== undefined){
+				// draw only if we go to a new room . 
+				var mapCoords = [80, 80]
+				var roomObj  =this.game.gameData.rooms[this.currentRoom];
+				if(roomObj.map !== undefined){
+					var thisMap = this.maps[roomObj.map];
+					// first coord is left/right, second is up/down 
+					d.drawRectangle(mc, 0, 0, mapCoords[0], mapCoords[1], "black",1, true);
+					var size = [mapCoords[0] / thisMap.size[0],mapCoords[1] / thisMap.size[1]] 
+					for(var i=0; i < thisMap.size[0]; i++){
+						for(var j=0 ; j < thisMap.size[1]; j++){
+							var drawName = thisMap.rooms[`${i} ${j}`];
+							var color = "#333333"
+							// if it's undefined, this is an unreachable room, does not exist in gameData
+							if(drawName !== undefined){
+								// portal
+								if(this.portalRooms.has(drawName)){
+									color = "#a032a8";
+								}
+								
+								// incomplete room
+								if(!this.game.isRoomCompleted(drawName)){
+									color = "#519e3c";
+								}
+
+								// current room
+								if(this.currentRoom == drawName){
+									color = "#aa3333";
+								}
+							}
+
+		
+							// unfinished rooms 
+							// entities are portal, npc or chest
+							// also monsters and items
+		
+							d.drawRectangle2(mc, size[0]*i, size[1]*j, size[0]-4, size[1]-4, color, 1, true);
+						}
+					}
+					// walls
+					for(var wall of thisMap.maze){
+						var wallX = size[0] * (wall[0]+1)
+						var wallY = size[1] * (wall[1]+1) 
+						if(wall[2] == "right"){
+							d.drawLine(mc, wallX, wallY - size[1] , wallX , wallY, "#756b44",4)
+						} else {
+							d.drawLine(mc, wallX-size[0], wallY  , wallX , wallY, "#756b44", 4)
+							
+						}
+						
+					}
+				}
+		
+			}
+		}
+
 		// display the things that happened
 		/*
 					"items" : a,
@@ -225,9 +319,13 @@ class GameDisplay extends React.Component {
 			}
 			for(var item of event_.entitiesFailed){
 				this.displayText(processString(item.displayString, item.reqs))
+				this.displayItems(item.reqs);
 			}
 			for(var item of event_.npcChat){
 				this.displayText(item)
+			}
+			if(event_.npcShowItems.length != 0){
+				this.displayItems(event_.npcShowItems)
 			}
 			// draw the blood if attack dealt damage
 			if(event_.attackedThisTick){
@@ -257,6 +355,7 @@ class GameDisplay extends React.Component {
 				var item = this.game.getLevel().monsters[index]
 				if(item != undefined){
 					this.displayText(processString(item.displayString, item.reqs))
+					this.displayItems(item.reqs);
 				}
 			}
 		}

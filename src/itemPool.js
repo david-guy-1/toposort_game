@@ -2455,7 +2455,7 @@ export function reset_(){
 
 export function loadAll(){
 	// base items
-	var baseImages = ["background.png", "cave.png",  "exclam.png", "glow_left.png", "glow_right.png","menu.png", "outside.png", "player_l.png", "player_l_attack.png", "player_r.png", "player_r_attack.png", "question.png", "scroll_left.png", "scroll_right.png", "signpost.png", "win.png", "cage.png", "boss_attack.png", "boss.png"];
+	var baseImages = ["checkmark.png", "background.png", "cave.png",  "exclam.png", "glow_left.png", "glow_right.png","menu.png", "outside.png", "player_l.png", "player_l_attack.png", "player_r.png", "player_r_attack.png", "question.png", "scroll_left.png", "scroll_right.png", "signpost.png", "win.png", "cage.png", "boss_attack.png", "boss.png"];
 	for(var image_ of  baseImages){
 		loadImage("./images/" + image_)
 	}

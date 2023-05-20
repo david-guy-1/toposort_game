@@ -60,14 +60,28 @@ export function drawCircle(context, x, y, r, color = "black", width = 1) {
     var p1 = { x: x, y: y };
     var p2 = { x: x, y: y };
 }
-//draws a circle with the given coordinates and color
-export function drawRectangle(context, tlx, tly, brx, bry, color = "black", width = 1) {
-    context.strokeStyle = (color == undefined ? "black" : color);
-    context.lineWidth = (width == undefined ? 1 : width);
-    context.beginPath();
-    context.rect(tlx, tly, brx - tlx, bry - tly);
-    context.stroke();
+//draws a rectangle with the given coordinates and color
+export function drawRectangle(context, tlx, tly, brx, bry, color = "black", width = 1, fill = false,  transparency=1) {
+	if(fill){
+		context.globalAlpha = transparency;
+		context.fillStyle = (color == undefined ? "black" : color);
+    	context.fillRect(tlx, tly, brx - tlx, bry - tly);
+		context.globalAlpha = 1;
+	}
+    else{
+		context.lineWidth = (width == undefined ? 1 : width);
+		context.strokeStyle = (color == undefined ? "black" : color);
+		context.beginPath();
+		context.rect(tlx, tly, brx - tlx, bry - tly);
+		context.stroke();
+	}
 }
+// uses width and height instead of bottom right coordinates
+export  function drawRectangle2(context, tlx, tly, width, height, color = "black", widthA = 1, fill = false,  transparency=1){
+	drawRectangle(context, tlx, tly, tlx+width, tly+height, color, widthA, fill,  transparency)
+	
+}
+
 
 export function drawText(context, text_, x, y, width =undefined, color = "black", size = 20) {
     context.font = size + "px Arial";
