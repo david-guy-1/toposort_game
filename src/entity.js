@@ -13,7 +13,7 @@ chest : set of items (coords are are built in)
 
 portal : triple [new location, new x, new y] , normal passages and keyed passages are also coded as portals.
 
-npc : list of objects : {requirements, displayString, items}
+npc : list of objects : {requirements, displayString, showItems, items}
 displayString and reqs are ignored for npcs
 
 will never give the same item twice.

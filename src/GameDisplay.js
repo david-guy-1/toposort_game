@@ -231,6 +231,7 @@ class GameDisplay extends React.Component {
 		//draw the items (important: at the very end);
 		for(var item of this.game.getLevel().items){
 			d.drawImageStr(uc, item.image, item.x,item.y); 
+			d.drawRectangle2(uc, item.x, item.y, 40, 40, "red", 2);
 		}		
 
 		

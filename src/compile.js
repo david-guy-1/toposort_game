@@ -417,6 +417,7 @@ function makeItemData(type, theme, seed){ // some other data might be needed
 	choice.type = type;
 	choice.theme = theme.name;
 	if(seen){
+		console.log("warning : seen")
 		var extraName = Math.random();
 		choice.name = choice.name + extraName.toString();
 	}
@@ -878,7 +879,7 @@ export function compile(dag, seed, name="compileNAME", chunkSizeMin = 6, chunkSi
 			var portalSourceData = makeItemData("portal", themes[section], seed + " portal " + i);
 			var portalSourceImages = getImage(portalSourceData);
 			
-			var portalDestData = makeItemData("portal", themes[section], seed + " portal dest" + i);
+			var portalDestData = makeItemData("portal", themes[i], seed + " portal dest" + i);
 			var portalDestImages = getImage(portalDestData);
 			// make a requirements array
 			var reqs = Array.from(dag.get_vertex_by_name(firstItem).prev).map((x) => dictionary[x.name])

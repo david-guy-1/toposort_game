@@ -119,7 +119,7 @@ export function addHintStrings(rooms, items, dictionary, itemData, itemHeldBy, t
 		itemHeldBy[vertex].holderObj.data[0].displayString = "Statue says : " + hintString;
 		itemHeldBy[vertex].holderObj.data = [{requirements: itemHeldBy[vertex].holderObj.data[0].requirements.concat([dictionary[toHintAt]]),
 		displayString: "(You already have this)" + "Statue says : " + hintString,
-		items : []}].concat(itemHeldBy[vertex].holderObj.data);
+		items : [], showItems : []}].concat(itemHeldBy[vertex].holderObj.data);
 	}
 	//split the rooms by chunk
 	var roomsByChunk = [];
