@@ -15,7 +15,7 @@ import {getProportions, interpret} from "./interpret.js";
 import {allHintStrings, addHintStrings} from "./hintStrings.js";
 import map from "./map.js"
 
-const _ = require("lodash");
+import _ from "lodash"
 
 
 // list utilities
@@ -195,6 +195,7 @@ export function walledRoom(name, left, right, up, down, theme, seed){
 	
 	// initialize image strings;
 	var background = "./images/" + theme.background;
+	var music = "./music/" + theme.music;
 	var wallImgString = _.cloneDeep(theme.wallImgString);
 	for(var word of ["left","right","up","down"]){
 		for (var i=0; i<wallImgString[word].length; i++){
@@ -222,7 +223,7 @@ export function walledRoom(name, left, right, up, down, theme, seed){
 		walls.add([50, 0, 50, 600])
 		imgs.add(new img(choice(wallImgString.left, seed + " left wall"), 0, 0))
 	} else {
-		entities.add(new entity(name + " left door", "portal", 0, 0, 80, 600, "", [left.destination, 910, 300],[],undefined))
+		entities.add(new entity(name + " left door", "portal", 0, 0, 80, 600, "", [left.destination, 910, 300],[],undefined,true))
 	}
 	
 
@@ -233,7 +234,7 @@ export function walledRoom(name, left, right, up, down, theme, seed){
 		walls.add([950, 0, 950, 600])
 		imgs.add(new img(choice(wallImgString.right, seed + " right wall"), 0, 0))
 	} else {
-		entities.add(new entity(name + " right door", "portal", 920, 0, 1000, 600, "", [right.destination, 90, 300],[],undefined))
+		entities.add(new entity(name + " right door", "portal", 920, 0, 1000, 600, "", [right.destination, 90, 300],[],undefined,true))
 	}
 	
 	//up
@@ -243,7 +244,7 @@ export function walledRoom(name, left, right, up, down, theme, seed){
 		walls.add([0, 25, 1000, 25])
 		imgs.add(new img(choice(wallImgString.up, seed + " up wall"), 0, 0))
 	} else {
-		entities.add(new entity(name + " up door", "portal", 0, 0, 1000, 45, "", [up.destination, 500, 530],[],undefined))
+		entities.add(new entity(name + " up door", "portal", 0, 0, 1000, 45, "", [up.destination, 500, 530],[],undefined,true))
 	}
 	
 		//down
@@ -253,7 +254,7 @@ export function walledRoom(name, left, right, up, down, theme, seed){
 		walls.add([0, 575, 1000, 575])
 		imgs.add(new img(choice(wallImgString.down, seed + " down wall"), 0, 0))
 	} else {
-		entities.add(new entity(name + " down door", "portal", 0, 555, 1000, 600, "", [down.destination, 500, 70],[],undefined))
+		entities.add(new entity(name + " down door", "portal", 0, 555, 1000, 600, "", [down.destination, 500, 70],[],undefined,true))
 	}
 	
 	
@@ -285,7 +286,7 @@ export function walledRoom(name, left, right, up, down, theme, seed){
 			}
 		}
 	}
-	return new room(name, entities, walls, imgs, [], [],[], background);
+	return new room(name, entities, walls, imgs, [], [],[], background,music);
 }
 
 
@@ -297,7 +298,7 @@ export function rootRoom(dest){
 	[], // reqImgs
 	[], // monsters
 	[], // drops
-	"./images/outside.png", //background
+	"./images/outside.png", //background,
 	)
 }
  
@@ -330,7 +331,7 @@ function chooseXY(name,seed){
 	// number [1, ... 8] for x
 	// number [1, ... 4] for y
 	// return 100*value + 50
-	//console.log("choose x y called " + seed);
+	////console.log("choose x y called " + seed);
 	var i=0
 	while(true){
 		var x = 100*randint(1, 9, seed + " choose x y" + i )+50;
@@ -417,7 +418,7 @@ function makeItemData(type, theme, seed){ // some other data might be needed
 	choice.type = type;
 	choice.theme = theme.name;
 	if(seen){
-		console.log("warning : seen")
+		//console.log("warning : seen")
 		var extraName = Math.random();
 		choice.name = choice.name + extraName.toString();
 	}
@@ -498,7 +499,7 @@ export function compileOne(dag, name, renderThese, assumeHas,dict,interpretation
 		throw new Error("undefined theme");
 	}
 	for(var item_ of renderThese){
-		//////console.log(item_)
+		////////console.log(item_)
 		if(dict[item_] != undefined){
 			throw new Error("repeat render");
 		}
@@ -521,7 +522,7 @@ export function compileOne(dag, name, renderThese, assumeHas,dict,interpretation
 		result = bfs(size, size, maze, start, start)[0]; // mazes are square, and start in the middle  
 	}
 	var thisMap = new map(maze, [dungeonSize, dungeonSize], name  + " map");
-	////console.log(result.size)
+	//////console.log(result.size)
 	// turn the maze into walledRoom
 	for(var point of result){
 		var x = parseInt(point.split(" ")[0])
@@ -624,10 +625,10 @@ export function compileOne(dag, name, renderThese, assumeHas,dict,interpretation
 		var roomToAdd = name + " " + roomToAdd0;
 		
 		//choose where in the room to add it
-		//console.log([seed, counter]);
+		////console.log([seed, counter]);
 		var location_ = chooseXY(roomToAdd, seed + "where in room" + counter);
 
-		//console.log([seed, counter, "end"]);
+		////console.log([seed, counter, "end"]);
 		// get item data 
 		var thisItemData = makeItemData( vertexIntType, theme.name, seed + " item data " + counter);
 		dictionary[vertex] = thisItemData.name
@@ -656,7 +657,7 @@ export function compileOne(dag, name, renderThese, assumeHas,dict,interpretation
 			choice_.add("chest")
 		}
 		if(!choice_.has(vertexIntSource)){
-			console.log("warning: vertexIntSource failed "  + vertexIntSource);
+			//console.log("warning: vertexIntSource failed "  + vertexIntSource);
 		}
 		var chosen = choice_.has(vertexIntSource) ? vertexIntSource : choice(choice_, seed + "choice2" + counter);
 		//if the holder is not "item", then the holder has data along with it too.
@@ -806,8 +807,8 @@ export function compile(dag, seed, name="compileNAME", chunkSizeMin = 6, chunkSi
 	
 	// interpret the DAG
 	var int_ = interpret(dag, sort, slices, seed + "interpret");
-	console.log("proportions are")
-	console.log(getProportions(int_[0], int_[1]))
+	//console.log("proportions are")
+	//console.log(getProportions(int_[0], int_[1]))
 
 	// since slicing adds new edges, clone the dag and mutate it.
 	var newDag = _.cloneDeep(dag);
@@ -832,7 +833,7 @@ export function compile(dag, seed, name="compileNAME", chunkSizeMin = 6, chunkSi
 		var mazeSize = Math.floor(Math.sqrt(things.size) + 2);
 		if(things.size > 50){
 			mazeSize = 5; // DEBUG
-			console.log("DEBUG MODE ON");
+			//console.log("DEBUG MODE ON");
 		}
 		roomSizes.push(mazeSize);
 		var result = compileOne(dag, name +" " + i , things, firstPred, dictionary,int_, seed + "compile1" + i, themes[i],i, i==slices.length-2, mazeSize)
@@ -866,7 +867,7 @@ export function compile(dag, seed, name="compileNAME", chunkSizeMin = 6, chunkSi
 			}
 			var room1Name = `${name} ${section} ${room1NamePre}`;
 			var room2Name = choice(result[3], seed + "add choice 2 " + i);
-			////console.log(room1Name)
+			//////console.log(room1Name)
 			room2Name = `${name} ${i} ${room2Name}`;
 			// add a connection
 			var loc1 = chooseXY(room1Name, seed + "place 1 " + i)
@@ -925,7 +926,7 @@ export function compile(dag, seed, name="compileNAME", chunkSizeMin = 6, chunkSi
 	var unusedStart = choice(unused[0], seed + " choose unused");
 	rooms["root"]  = rootRoom(`${name} 0 ${unusedStart}`)
 	// add backwards edges
-	console.log([rooms, items, dictionary, itemData, itemHeldBy, themes, sort,portals, newDag, sort[sort.length-1],roomSizes])
+	//console.log([rooms, items, dictionary, itemData, itemHeldBy, themes, sort,portals, newDag, sort[sort.length-1],roomSizes])
 	
 	
 	for(var i=0; i<backEdges; i++){
@@ -939,7 +940,7 @@ export function compile(dag, seed, name="compileNAME", chunkSizeMin = 6, chunkSi
 			break;
 		}
 		var chosenPair = choice(pairs, seed + " backwards edge " + i);
-		console.log(chosenPair);
+		//console.log(chosenPair);
 		newDag.add_edge(chosenPair[1], chosenPair[0]);
 		
 		// chosenPair[1] is now a pre-requisite for chosenPair[0]
@@ -966,7 +967,7 @@ export function compile(dag, seed, name="compileNAME", chunkSizeMin = 6, chunkSi
 	}
 	
 	
-	console.log([rooms, items, dictionary, itemData, itemHeldBy, themes, sort,portals, newDag, sort[sort.length-1],roomSizes])
+	//console.log([rooms, items, dictionary, itemData, itemHeldBy, themes, sort,portals, newDag, sort[sort.length-1],roomSizes])
 	// add hint strings.
 	var signs = addHintStrings(rooms, items, dictionary, itemData, itemHeldBy, themes, sort,portals, newDag, sort[sort.length-1],roomSizes, slices, seed + " hint strings ");
 	var counter = 0;
@@ -981,7 +982,7 @@ export function compile(dag, seed, name="compileNAME", chunkSizeMin = 6, chunkSi
 		rooms[room_].entities.add(signEntity);
 	}
 	var allHintStringsVar = allHintStrings(rooms, items, dictionary, itemData, itemHeldBy, themes, sort,portals, newDag, sort[sort.length-1],roomSizes, slices)
-	console.log(["compile done", Date.now()]);
+	//console.log(["compile done", Date.now()]);
 	
 	
 	// final room

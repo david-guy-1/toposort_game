@@ -1,5 +1,6 @@
 import vertex from "./vertex.js";
 import {union} from "./lines.js"
+import flow_network from "./flow_network.js";
 
 /*
 class vertex{
@@ -258,6 +259,31 @@ cy.mount()
 			}
 		
 	}
+	width(){
+		// generate flow network from this dag
+		if(this.vertices.has("s") || this.vertices.has("t")){
+			throw "dag already has s and t!"
+		} 
+		var v = [...this.vertices];
+		var vertices = ["s", "t"].concat(v.map((x) => x.name + " left")).concat(v.map((x) => x.name + " right"));
+		var edges = {};
+		for(var item of this.vertices){
+			edges["s_" + item.name + " left"] = 1;
+			edges[item.name + " right" + "_t"] = 1;
+			for(var v2 of item.succ){
+				edges[item.name + " left_" + v2.name + " right"] = v.length + 1;
+			}
+		}
+		var result =  new flow_network(vertices, edges).ford_fulkerson("s", "t")
+		// size is number of vertices - result[0]
+		
+		// to find the largest antichain, take the complement of the vertex cover. The vertex cover can be found from the cut set  (can't reach left, can reach right)
+		// vertices not in vertex cover : can reach left and can't reach right
+		var antichain = new Set([...this.vertices].map((x) => x.name).filter((x) => result[2].has(x + " left") && !result[2].has(x + " right")));
+		return [this.vertices.size - result[0],antichain];
 
+	}
 }
+
 export default dag;
+

@@ -2,7 +2,7 @@ import dag from "./dag.js";
 
 import {random, randint, choice, reset_} from "./random.js"
 
-const _ = require("lodash");
+import _ from "lodash"
 
 // source and target are vertex instances
 function addEdgeSmart(dag_, source, target, seed){
@@ -32,7 +32,7 @@ function addEdgeSmart(dag_, source, target, seed){
 			}	
 }
 export function makeDag(vertices, seed){
-	console.log(["start make dag", Date.now()]);
+	//console.log(["start make dag", Date.now()]);
 	reset_(); // random.reset 
 	if(vertices < 3){
 		throw new Error("vertices less than 3");
@@ -53,7 +53,7 @@ export function makeDag(vertices, seed){
 		var target = choice(dag_.vertices, seed + " choose random 1 " + i);
 		addEdgeSmart(dag_, source, target, seed + " " + i);
 	}
-	console.log(["add edges done", Date.now()]);
+	//console.log(["add edges done", Date.now()]);
 	
 	var finalName = "x" + (vertices-1);
 
@@ -71,7 +71,7 @@ export function makeDag(vertices, seed){
 		}
 	
 	}
-	console.log(["all dag pred", Date.now()]);
+	//console.log(["all dag pred", Date.now()]);
 	return dag_;
 }
 

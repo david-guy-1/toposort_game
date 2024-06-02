@@ -62,12 +62,13 @@ export var themeData = {
 			"walls":wallFromCorners([[10,52],[24,20],[42,12],[60,18],[71,59],[41,67],[22,66]])
 		}
 		],		
-		
+		"music":"a.mp3",
 		
 		"chests":[],
 		"monsters":[],
 		"npcs":[],
 		"portals":[],
+
 		
 		
 	},
@@ -86,6 +87,7 @@ export var themeData = {
 			"walls":wallFromCorners([[12,20],[22,10],[54,7],[60,52],[41,73],[8,69],[40,59],[41,20]])
 		}],		
 		
+		"music":"b.mp3",
 		"chests":[],
 		"monsters":[],
 		"npcs":[],
@@ -105,6 +107,7 @@ export var themeData = {
 		
 		"blockingDecorations" :[],		
 		
+		"music":"c.mp3",
 		"chests":[],
 		"monsters":[],
 		"npcs":[],
@@ -128,6 +131,7 @@ export var themeData = {
 		}],		
 		
 		
+		"music":"d.mp3",
 		"chests":[],
 		"monsters":[],
 		"npcs":[],
@@ -151,6 +155,7 @@ export var themeData = {
 		}],		
 		
 		
+		"music":"e.mp3",
 		"chests":[],
 		"monsters":[],
 		"npcs":[],
@@ -170,6 +175,7 @@ export var themeData = {
 		"blockingDecorations" :[],		
 		
 		
+		"music":"f.mp3",
 		"chests":[],
 		"monsters":[],
 		"npcs":[],

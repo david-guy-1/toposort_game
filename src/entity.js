@@ -21,7 +21,7 @@ will never give the same item twice.
 const validTypes = new Set(["chest","portal", "npc"]);
 
 class entity{
-	constructor(name,type,tlx,tly,brx,bry,displayString, data,reqs, img){
+	constructor(name,type,tlx,tly,brx,bry,displayString, data,reqs, img, isEdgeWall){
 		if(!validTypes.has(type)){
 			throw new Error("invalid type of entity : " + type);
 		}
@@ -45,6 +45,7 @@ class entity{
 		this.data = data
 		this.reqs = reqs
 		this.img = img; // image to be displayed when not activated yet. not used once activated.
+		this.isEdgeWall = isEdgeWall == undefined ? false : isEdgeWall;
 		
 	}
 }

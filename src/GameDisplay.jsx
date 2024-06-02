@@ -7,7 +7,9 @@ import {getImage} from "./compile.js";
 import dag from "./dag.js";
 import processString from "./processString.js";
 import {keyItems, miscItems} from "./itemPool.js";
-
+import * as anim from "./animations.js";
+import draw from "./process_draws.js"
+import _ from "lodash";
 // tentative name : The Cave Rescue Adventure
 
 class GameDisplay extends React.Component {
@@ -19,6 +21,7 @@ class GameDisplay extends React.Component {
 		this.lowerCanvas = React.createRef();
 		this.upperCanvas = React.createRef();
 		this.itemCanvas = React.createRef();
+		this.particleCanvas = React.createRef();
 		this.playerCanvas = React.createRef();
 		this.topCanvas = React.createRef();
 		this.inventoryCanvas = React.createRef();
@@ -39,6 +42,8 @@ class GameDisplay extends React.Component {
 		this.portalRooms = this.props.portalRooms;
 		this.back = this.props.back;
 		this.win = this.props.win;
+		this.setMusic = this.props.setMusic
+		this.music = undefined;
 		this.mouseX = 0;
 		this.mouseY = 0;
 		this.mouseDown = false;
@@ -53,6 +58,7 @@ class GameDisplay extends React.Component {
 		this.invNames = [];
 		this.lastDisplayedItems = Date.now();
 		this.showMap = true; 
+		this.animations = [];
 		
 	}
 	mouseMove(e){
@@ -79,7 +85,7 @@ class GameDisplay extends React.Component {
 		
 	  return (
 		<div className="App" onMouseMove={this.mouseMove} onMouseDown={function(){this.mouseDown = true;}.bind(this)} onMouseUp={function(){this.mouseDown = false;}.bind(this)}>
-		<img style={{position:"absolute", top:0, left:0, zIndex:-1}} src={require("./images/game_background.png")} /> 
+		<img style={{position:"absolute", top:0, left:0, zIndex:-1}} src="./images/game_background.png"/> 
 			
 		<div id="seed" style={{position:"absolute", top:10, left:40, zIndex:0, width:950}} ref={this.topCanvas}>{`seed:"${this.props.seed}" size:${this.props.size} ` }</div>
 			
@@ -88,15 +94,16 @@ class GameDisplay extends React.Component {
 		
 		<canvas width={990} height={600} id="lowerCanvas" style={{position:"absolute", top:80, left:0, zIndex:0}} ref={this.lowerCanvas}/>
 		<canvas width={990} height={600} id="upperCanvas" style={{position:"absolute", top:80, left:0, zIndex:1, border:"1px solid black"}}ref={this.upperCanvas}/>
+		<canvas width={990} height={600} id="particleCanvas" style={{position:"absolute", top:80, left:0, zIndex:1, border:"1px solid black"}}ref={this.particleCanvas}/>
 		<canvas width={990} height={600} id="playerCanvas" style={{position:"absolute", top:80, left:0, zIndex:2, border:"1px solid black"}}ref={this.playerCanvas}/>
 		<canvas width={90} height={600} id="itemCanvas" style={{position:"absolute", top:80, left:1005, zIndex:2}} ref={this.itemCanvas}/>
 		<canvas width={80} height={80} id="mapCanvas" style={{position:"absolute", top:80, left:910, zIndex:3, border:"1px solid black", display : this.showMap ? "" : "none"}}ref={this.mapCanvas}/>
 
 		<canvas width={720} height={45} ref={this.inventoryCanvas} onMouseMove = {this.mouseOverInv} id="inventoryCanvas" style={{position:"absolute", top:690, left:70,  border:"1px solid black", zIndex:0}} />
 		
-		<img src={require("./images/scroll_left.png")} onMouseOver = {function(){this.inventoryScrollDirection="left"}.bind(this)} onMouseOut = {function(){this.inventoryScrollDirection=undefined}.bind(this)} id="scrollLeft" style={{position:"absolute", top:690, left:20,  border:"1px solid black", zIndex:0}} />
+		<img src="./images/scroll_left.png" onMouseOver = {function(){this.inventoryScrollDirection="left"}.bind(this)} onMouseOut = {function(){this.inventoryScrollDirection=undefined}.bind(this)} id="scrollLeft" style={{position:"absolute", top:690, left:20,  border:"1px solid black", zIndex:0}} />
 		
-		<img src={require("./images/scroll_right.png")} onMouseOver = {function(){this.inventoryScrollDirection="right"}.bind(this)} onMouseOut = {function(){this.inventoryScrollDirection=undefined}.bind(this)} id="scrollRight" style={{position:"absolute", top:690, left:800,  border:"1px solid black", zIndex:0}} />
+		<img src="./images/scroll_right.png" onMouseOver = {function(){this.inventoryScrollDirection="right"}.bind(this)} onMouseOut = {function(){this.inventoryScrollDirection=undefined}.bind(this)} id="scrollRight" style={{position:"absolute", top:690, left:800,  border:"1px solid black", zIndex:0}} />
 
 		
 		<button  onClick={this.back} id="backButton" style={{position:"absolute", top:690, left:850, width:100 ,height:20 ,border:"1px solid black", zIndex:0}}>Back</button>
@@ -127,9 +134,9 @@ class GameDisplay extends React.Component {
 		var drawY = 10; 
 		for(var item of lst){
 			var itemPath = keyItems[item] == undefined ? getImage({"type":"misc", "image":miscItems[item].image})  : getImage({"type":"key", "image":keyItems[item].image}); 
-			d.drawImageStr(ic2 ,itemPath, 5, drawY);
+			d.drawImage(ic2 ,itemPath, 5, drawY);
 			if(inventoryNames.indexOf(item) !== -1){
-				d.drawImageStr(ic2,"./images/checkmark.png", 50, drawY);
+				d.drawImage(ic2,"./images/checkmark.png", 50, drawY);
 			}
 			drawY += 50;
 		}
@@ -143,6 +150,7 @@ class GameDisplay extends React.Component {
 		npcChat -> list of strings (what npcs have said)
 		monstersAttacked -> list of numbers (indices of attacked monsters)
 		monstersFailed -> list of numbers (indices of monsters failed to attack)
+		dropped -> boolean (if monster dropped)
 		newRoom -> new room (if applicable)
 		*/		
 		var now = Date.now();
@@ -151,6 +159,7 @@ class GameDisplay extends React.Component {
 		var lc = this.lowerCanvas.current.getContext("2d");
 		var ic = this.inventoryCanvas.current.getContext("2d");
 		var mc = this.mapCanvas.current.getContext("2d");
+		var pac = this.particleCanvas.current.getContext("2d");
 		var ic2 = this.itemCanvas.current.getContext("2d");
 		// clear everything
 		pc.clearRect(0,0,1000,1000);
@@ -160,19 +169,19 @@ class GameDisplay extends React.Component {
 		}
 		var level = this.game.getLevel();
 		//this.displayText("abcabcabcabcabcabcabcabcabcabcabcabcabcabcabcd")
-//d.drawImageStr(uc,"./images/green_potion.png", 400, 400);
+//d.drawImage(uc,"./images/green_potion.png", 400, 400);
 	
 		//draw the player
 		//sizes are 40x80 not attacking, and 80x80 attacking
 		
 		if(level.facingDirection == "left" && this.mouseDown == false){
-			d.drawImageStr(pc, "./images/player_l.png", level.x - 20, level.y - 40) 
+			d.drawImage(pc, "./images/player_l.png", level.x - 20, level.y - 40) 
 		} else if(level.facingDirection == "left" && this.mouseDown == true){
-			d.drawImageStr(pc, "./images/player_l_attack.png", level.x - 60, level.y - 40) 
+			d.drawImage(pc, "./images/player_l_attack.png", level.x - 60, level.y - 40) 
 		} else if(level.facingDirection == "right" && this.mouseDown == false){
-			d.drawImageStr(pc, "./images/player_r.png", level.x - 20, level.y - 40) 
+			d.drawImage(pc, "./images/player_r.png", level.x - 20, level.y - 40) 
 		} else if(level.facingDirection == "right" && this.mouseDown == true){
-			d.drawImageStr(pc, "./images/player_r_attack.png", level.x - 20, level.y - 40) 
+			d.drawImage(pc, "./images/player_r_attack.png", level.x - 20, level.y - 40) 
 		} 
 
 		// get indices of attacked monsters
@@ -193,26 +202,26 @@ class GameDisplay extends React.Component {
 		for(var item of level.getMonsters()){
 			if(item.hp > 0){
 				if(this.attackedIndex.indexOf(item.index) != -1 && this.mouseDown){
-					d.drawImageStr(uc, item.monster.img[1], item.x, item.y);
+					d.drawImage(uc, item.monster.img[1], item.x, item.y);
 				} else {
-					d.drawImageStr(uc, item.monster.img[0], item.x, item.y);
+					d.drawImage(uc, item.monster.img[0], item.x, item.y);
 				}
 				
 			}
 		}
 		//draw the entities
 		for(var item of level.entities){
-				d.drawImageStr(uc, item.img, item.tlx, item.tly);
+				d.drawImage(uc, item.img, item.tlx, item.tly);
 		}		
 		// important: draw image AFTER drawing monsters and entities
 		//draw the imgs
 		for(var item of level.imgs){
 			if(item.whenDraw != "always"){
 				if(this.game.meetRequirements(item.reqs) == (item.whenDraw == "met")){
-					d.drawImageStr(uc, item.img, item.x, item.y);
+					d.drawImage(uc, item.img, item.x, item.y);
 				}
 			} else {
-				d.drawImageStr(uc, item.img, item.x, item.y);
+				d.drawImage(uc, item.img, item.x, item.y);
 			}
 				
 		}		
@@ -222,7 +231,7 @@ class GameDisplay extends React.Component {
 		for(var item of level.reqImgs){
 			for(var check of item.data){
 				if(this.game.meetRequirements(check.requirements)){
-					d.drawImageStr(uc, check.image, item.x, item.y);
+					d.drawImage(uc, check.image, item.x, item.y);
 					break;
 				}
 			}
@@ -230,7 +239,7 @@ class GameDisplay extends React.Component {
 		
 		//draw the items (important: at the very end);
 		for(var item of this.game.getLevel().items){
-			d.drawImageStr(uc, item.image, item.x,item.y); 
+			d.drawImage(uc, item.image, item.x,item.y); 
 			d.drawRectangle2(uc, item.x, item.y, 40, 40, "red", 2);
 		}		
 
@@ -240,7 +249,7 @@ class GameDisplay extends React.Component {
 			this.currentRoom = this.game.getLocation();
 			var lc = this.lowerCanvas.current.getContext("2d");
 			lc.clearRect(0,0,1000,1000);
-			d.drawImageStr(lc, level.background, 0, 0);
+			d.drawImage(lc, level.background, 0, 0);
 		}
 
 		// draw the map 
@@ -345,10 +354,10 @@ class GameDisplay extends React.Component {
 			
 			if(damaged && this.mouseDown){
 				if(level.facingDirection == "left"){
-					d.drawImageStr(pc, "./images/glow_left.png", level.x - 60, level.y - 40) 
+					d.drawImage(pc, "./images/glow_left.png", level.x - 60, level.y - 40) 
 				}
 				if(level.facingDirection == "right"){
-					d.drawImageStr(pc, "./images/glow_right.png", level.x - 20, level.y - 40) 
+					d.drawImage(pc, "./images/glow_right.png", level.x - 20, level.y - 40) 
 				}
 				
 			}
@@ -369,8 +378,36 @@ class GameDisplay extends React.Component {
 				this.invNames.push(item[0]);
 			}
 			
-			d.drawImageStr(ic, item[1], 40*this.invNames.indexOf(item[0])-this.inventoryScroll, 0)
+			d.drawImage(ic, item[1], 40*this.invNames.indexOf(item[0])-this.inventoryScroll, 0)
 		}
+		// update music
+		if(this.music != level.music){
+			this.music = level.music;
+			this.setMusic(level.music);
+		}
+		// finally do animations
+		var lst = [];
+		for(var event_ of events){
+			if(event_.itemsAdded.length != 0){ // entities
+				anim.spawn_stars(this.animations, level.x, level.y);
+			}
+			if(event_["dropped"] == true) { // enemy
+				for(var i=0; i<100; i++){
+					anim.spawn_circle(this.animations, level.x, level.y, "hsl("+ Math.random() * 360 + ", 100%, 90%)", 7, 150)
+				}
+			} 
+		}
+		var portals = [...level.entities].filter((x) => x.type == "portal" && x.isEdgeWall == false && x.name != "root portal");
+		for(var portal of portals){
+			var isOpen = this.game.meetRequirements(portal.reqs);
+			if(isOpen){
+				anim.spawn_circle(this.animations, (portal.brx-portal.tlx)/2 + portal.tlx, (portal.bry-portal.tly)/2 + portal.tly)
+			}
+		}
+		anim.add_drawings(lst, this.animations);
+		pac.clearRect(0, 0, 1000, 1000);
+		draw(lst, pac);
+
 	}
 	inventoryScrollFn(direction, speed){
 		var holdable = 720 / 40  // inventoryCanvas width / image size;
@@ -397,6 +434,7 @@ class GameDisplay extends React.Component {
 		var events = []
 		while(this.lastRendered < now){
 			events.push(this.game.tick(this.mouseX, this.mouseY, this.mouseDown));
+			anim.update_all(this.animations);
 			this.lastRendered += interval;
 		}
 		this.update(events);

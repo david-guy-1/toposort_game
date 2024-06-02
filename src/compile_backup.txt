@@ -11,7 +11,7 @@ import {processString} from "./canvasDrawing.js";
 import {random, randint, choice, reset_ } from "./random.js"
 import * as P from "./itemPool.js";
 import themeData from "./themeData.js"
-const _ = require("lodash");
+import _ from "lodash"
 
 
 // list utilities

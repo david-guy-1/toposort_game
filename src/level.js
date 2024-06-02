@@ -1,7 +1,7 @@
 import * as l from "./lines.js"
 // one single screen
 class level{
-	constructor(game, walls,items,entities,imgs,reqImgs,monsters,background,x, y){
+	constructor(game, walls,items,entities,imgs,reqImgs,monsters,background,x, y, music){
 		if(Array.isArray(monsters)){
 			monsters = new Set(monsters);
 		}
@@ -24,6 +24,7 @@ class level{
 			items = new Set(items);
 		}
 		this.game = game;
+		this.music = music;
 		this.x = x;
 		this.y = y;
 		this.walls = walls; // quadruples : tlx, tly, brx, bry. // is a set

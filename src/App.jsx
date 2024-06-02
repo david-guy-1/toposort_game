@@ -1,13 +1,14 @@
 import {compile} from "./compile.js";
 import dag from "./dag.js";
 import game from "./game.js";
-import GameDisplay from "./GameDisplay.js";
+import GameDisplay from "./GameDisplay.jsx";
 import React from 'react';
 import makeDag from './makeDag';
 import {getImageForItem, loadAll} from "./itemPool.js"
 import {sha256} from "./random.js";
-const cytoscape = require("cytoscape");
-const _ = require("lodash");
+import Sound from "./Sound.jsx";
+import cytoscape from "cytoscape";
+import _ from "lodash"
 
 class App extends React.Component {
 	constructor(props){
@@ -16,9 +17,10 @@ class App extends React.Component {
 		this.clicked = this.clicked.bind(this);
 		this.back = this.back.bind(this);
 		this.win = this.win.bind(this);
-		
+		this.changeSound = this.changeSound.bind(this);
 		this.iconRef = React.createRef();
 		this.graphRef = React.createRef();
+		this.soundRef = React.createRef();
 		this.sortRef = React.createRef();
 		Set.prototype.toJSON = function(){
 			return Array.from(this);
@@ -45,38 +47,38 @@ class App extends React.Component {
 		
 		this.seed = seed;
 		this.size = size;
+
 		// get a dag
 		switch(size){
 			case "tiny":
-				var dag_ = makeDag(10, this.seed + " " + size);
-				var compileResult = compile(dag_, this.seed + " " + size, this.seed + " name " , 3, 4, 0);
+				var dag_ = makeDag(10, seed + " " + size);
+				var compileResult = compile(dag_, seed + " " + size, seed + " name " , 3, 4, 0);
 			break;
 			case "small":
-				var dag_ = makeDag(20, this.seed + " " + size);
-				var compileResult = compile(dag_, this.seed + " " + size, this.seed + " name " , 4, 6, 2);
+				var dag_ = makeDag(20, seed + " " + size);
+				var compileResult = compile(dag_, seed + " " + size, seed + " name " , 4, 6, 2);
 			break;
 			case "medium":
-				var dag_ = makeDag(30, this.seed + " " + size);
-				var compileResult = compile(dag_, this.seed + " " + size, this.seed + " name " , 5, 8, 5);
+				var dag_ = makeDag(30, seed + " " + size);
+				var compileResult = compile(dag_, seed + " " + size, seed + " name " , 5, 8, 5);
 			break;
 			case "large":
-				var dag_ = makeDag(50, this.seed + " " + size);
-				var compileResult = compile(dag_, this.seed + " " + size, this.seed + " name " , 6, 13, 10);
+				var dag_ = makeDag(50, seed + " " + size);
+				var compileResult = compile(dag_, seed + " " + size, seed + " name " , 6, 13, 10);
 			break;
 			case "huge":
-				var dag_ = makeDag(80, this.seed + " " + size);
-				var compileResult = compile(dag_, this.seed + " " + size, this.seed + " name " , 9, 18, 30);
+				var dag_ = makeDag(80, seed + " " + size);
+				var compileResult = compile(dag_, seed + " " + size, seed + " name " , 9, 18, 30);
 			break;
 			case "giant":
-				var dag_ = makeDag(150, this.seed + " " + size);
-				var compileResult = compile(dag_, this.seed + " " + size, this.seed + " name " , 12, 27, 60);
+				var dag_ = makeDag(150, seed + " " + size);
+				var compileResult = compile(dag_, seed + " " + size, seed + " name " , 12, 27, 60);
 			break;
 			case "debug":
-				var dag_ = makeDag(180, this.seed + " " + size);
-				var compileResult = compile(dag_, this.seed + " " + size, this.seed + " name " , 180, 180);
+				var dag_ = makeDag(180, seed + " " + size);
+				var compileResult = compile(dag_, seed + " " + size, seed + " name " , 180, 180);
 			break;
-			
-			
+
 		}
 		this.itemHeldBy = compileResult[3];
 		this.dictionary = compileResult[2];
@@ -96,9 +98,7 @@ class App extends React.Component {
 		
 		//this.win(72.37,["blue star", "cyan water scroll", "purple apple book", "silver wand", "silver flower", "yellow flower", "blue orb with explosion", "purple orb with leaf", "cyan key"],[3520, 13370, 22295, 43621, 50345, 52670, 59220, 63919, 69195]);
 		//return;
-		
-		// end debug
-		
+		console.log(this.dag.width());
 		this.setState({mode:"game"})
 	}
 	back(){
@@ -149,7 +149,7 @@ class App extends React.Component {
 			var index = 0;
 			for(var vertex of this.dag.vertices){
 				lst.push({ group: 'nodes', data: { id: vertex.next.size == 0 ? "Anna" : this.dictionary[vertex.name] }, position: { x: (vertex.next.size == 0 ? this.sort.length : this.sort.indexOf(this.dictionary[vertex.name]))*multiplier+20, y: Math.random() * 630 + 10 }, style : {
-					"background-image":vertex.next.size == 0? undefined : require("./images/items/" + getImageForItem(this.dictionary[vertex.name])),"background-fit": "cover cover"
+					"background-image":vertex.next.size == 0? undefined : "./images/items/" + getImageForItem(this.dictionary[vertex.name]),"background-fit": "cover cover"
 				}	})
 			}
 			//edges
@@ -165,6 +165,9 @@ class App extends React.Component {
 			console.log(lst)
 			
 		} 
+	}
+	changeSound(s){
+		this.soundRef.current.changeSound(s);
 	}
 	render(){
 		
@@ -187,7 +190,7 @@ class App extends React.Component {
 			return <div>
 			
 			
-			<img src={require("./images/menu.png")} style={{position:"absolute", top:0, left:0,"zIndex":-1}} /> 
+			<img src="./images/menu.png" style={{position:"absolute", top:0, left:0,"zIndex":-1}} /> 
 			<div style={titleStyle}>The Magical Cave Adventure</div><br />
 			<button style={styles[0]} onClick={() => this.clicked("tiny")}>Start (tiny)</button><br />
 			<button style={styles[1]} onClick={() => this.clicked("small")}>Start (small)</button><br />
@@ -202,7 +205,7 @@ class App extends React.Component {
 			case "make seed":
 			
 			return <div>
-			<img src={require("./images/menu.png")} style={{position:"absolute", top:0, left:0,"zIndex":-1}} /> 
+			<img src="./images/menu.png" style={{position:"absolute", top:0, left:0,"zIndex":-1}} /> 
 			<div style={titleStyle}>Enter a seed, or leave blank to randomly generate seed </div>
 			<textarea ref={this.iconRef} style={styles[0]} id="seed"></textarea> 
 			<button style={styles[4]}  onClick={function(){
@@ -220,8 +223,8 @@ class App extends React.Component {
 			break;
 			case "game":
 			return <div>
-			<GameDisplay dag_={this.dag} game={this.game} back={this.back} win={this.win} seed={this.seed} size={this.size} maps={this.maps} portalRooms={this.portalRooms}/>
-				
+			<GameDisplay dag_={this.dag} game={this.game} back={this.back} win={this.win} seed={this.seed} size={this.size} maps={this.maps} portalRooms={this.portalRooms} setMusic={this.changeSound}/>
+			<Sound  ref={this.soundRef}/>
 			</div>
 			break;
 			case "win": // win screen
@@ -230,9 +233,10 @@ class App extends React.Component {
 			// and end is 470, 378
 			// render below this mark
 				return <div>
-				<img src={require("./images/win.png")} style={{position:"absolute", top:0, left:0}} />
+				<img src="./images/win.png" style={{position:"absolute", top:0, left:0}} />
 				<h2 style={{position:"absolute", top:165, left:170}}>You have rescued Anna! </h2>
-				<h4 style={{position:"absolute", top:210, left:150}}>Your time : {Math.floor(this.time.toString())} seconds</h4>
+				<h4 style={{position:"absolute", top:190, left:150}}>Your time : {Math.floor(this.time.toString())} seconds</h4>
+				<span style={{position:"absolute", top:230, left:150}}>Width : {this.dag.width()[0]} <a target="_blank" href="https://en.wikipedia.org/wiki/Dilworth%27s_theorem">What's this?</a></span> 
 				<button style={{position:"absolute", top:260, left:150, width:150, height:25}} onClick={() => this.setState({mode : "graph"}) } >View dependencies </button>
 				<button style={{position:"absolute", top:294, left:150, width:150, height:25}} onClick={() => this.setState({mode : "sort"})}>View order collected </button>
 				
@@ -243,7 +247,10 @@ class App extends React.Component {
 			case "graph":
 				return <div>
 				<div ref={this.graphRef} style={{position:"absolute", top:10, left:10, width:1000, height:650}} ></div> 
-				<div style={{position:"absolute", top:660, left:100, width:150, height:40}} >You can drag things with your mouse</div>
+				<div style={{position:"absolute", top:660, left:100, width:150, height:40}} >You can drag things with your mouse<br />
+				Graph visualization by <a href="https://js.cytoscape.org/" target="_blank">Cytoscape</a><br />
+				Piano notes by <a href="https://archive.org/details/25405-tedagame-88-piano-keys-long-reverb" target="_blank">TEDAGAME</a><br />
+				</div>
 				<button style={{position:"absolute", top:660, left:500, width:150, height:40}}onClick={() => this.setState({mode : "win"})}>Go back</button>
 				</div>
 			break;
@@ -264,7 +271,7 @@ class App extends React.Component {
 						for(var i=0; i<this.sort.length; i++){
 							var sortItem = this.sort[i];
 							var theTime = this.times[i];
-							lst.push(<tr><td style={borderObj}>{i+1}</td> <td style={borderObj}> <img src={require("./images/items/" + getImageForItem(sortItem))} /></td><td style={borderObj}> {sortItem}</td><td style={borderObj}>{Math.floor(theTime/1000)}</td><td style={borderObj}>{this.itemHeldBy[this.reverseDictionary[sortItem]].theme}</td></tr>);
+							lst.push(<tr><td style={borderObj}>{i+1}</td> <td style={borderObj}> <img src={"./images/items/" + getImageForItem(sortItem)} /></td><td style={borderObj}> {sortItem}</td><td style={borderObj}>{Math.floor(theTime/1000)}</td><td style={borderObj}>{this.itemHeldBy[this.reverseDictionary[sortItem]].theme}</td></tr>);
 						}
 						// last element
 						lst.push(<tr><td style={borderObjLast}>{this.sort.length+1}</td> <td style={borderObjLast}></td><td style={borderObjLast}>Anna</td><td style={borderObjLast}>{Math.floor(this.time)}</td><td style={borderObjLast}></td></tr>);

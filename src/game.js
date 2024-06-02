@@ -1,7 +1,7 @@
 import level from "./level.js";
 import * as l from "./lines.js"
 
-const _ = require("lodash");
+import _ from "lodash"
 
 class game{
 	constructor(gd, dag, reverseDict, hintStrings, maps){
@@ -93,7 +93,7 @@ class game{
 		var background = room.background;
 		var imgs = room.imgs;
 		var reqImgs = room.reqImgs;
-		return new level(this, walls,items,entities,imgs,reqImgs, monsters,background,x,y);
+		return new level(this, walls,items,entities,imgs,reqImgs, monsters,background,x,y, room.music);
 		
 	}
 	//returns a single string completely saying where the player is in the dungeon.
@@ -139,8 +139,10 @@ class game{
 			"entitiesFailed" : b[1],
 			"npcChat" : b[2],
 			"npcShowItems" : b[3],
+			"itemsAdded": b[4],
 			"monstersAttacked" : c == undefined ? [] : c[0],
 			"monstersFailed" : c == undefined ? [] : c[1],
+			"dropped" : c == undefined ? false : c[2],
 			"newRoom"  : d,
 			"attackedThisTick" : attackedThisTick,
 		}
@@ -187,6 +189,7 @@ class game{
 		var failed = [];
 		var npcChat  = [];
 		var npcShowItems = [];
+		var itemsAdded = [];
 		for(var entity of entities){
 			// don't meet requirements? continue;
 			if(!this.meetRequirements(entity.reqs)){
@@ -199,6 +202,7 @@ class game{
 					// open the chest;
 					this.completedEntities.add(entity.name)
 					this.items[this.currentRoom] = l.union(this.items[this.currentRoom], entity.data)
+					itemsAdded =itemsAdded.concat(entity.data)
 				break;
 				case "portal":
 					if(Date.now() - this.lastEnteredTime  > 500){
@@ -220,6 +224,7 @@ class game{
 								if(!this.completedEntities.has(entity.name + item.name)){
 									this.completedEntities.add(entity.name + item.name)
 									this.items[this.currentRoom].add(item)
+									itemsAdded.push(item);
 								}
 							}
 							break;
@@ -228,7 +233,7 @@ class game{
 				break;
 			}
 		}
-		return [activated, failed, npcChat, npcShowItems];
+		return [activated, failed, npcChat, npcShowItems, itemsAdded];
 	}
 	
 	attack(){
@@ -237,6 +242,7 @@ class game{
 		var monsters = this.level.getMonsters();
 		var attacked = [];
 		var failed = [];
+		var drop = false; 
 		for(var i of indices){
 			var monster = monsters[i];
 			// if meets requirements, reduce monster HP;
@@ -249,9 +255,10 @@ class game{
 			if(this.level.allDead() && !this.completedMonsters.has(this.currentRoom)){
 				this.completedMonsters.add(this.currentRoom);
 				this.items[this.currentRoom] = l.union(this.items[this.currentRoom], room.drops)
+				drop = true;
 			}
 		}
-		return [attacked , failed]
+		return [attacked , failed, drop ]
 	}
 	
 	synchronize(){
