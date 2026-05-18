@@ -16,7 +16,7 @@ class game{
 		
 		// load all images
 		// fix all room names
-		
+		this.visited = new Set(); 
 		this.startTime = Date.now();
 		this.lastEnteredTime = Date.now();
 		this.sort = [];
@@ -117,6 +117,7 @@ class game{
 		//console.log([mouseX, mouseY, mouseDown]);
 		// move player
 		this.getLevel().moveToPoint(mouseX-this.canvasTL[0], mouseY-this.canvasTL[1], 20 + Math.random() * 1);
+		this.visited.add(this.currentRoom);
 		var a = this.pickUpItems();
 		var b = this.activateEntities();
 		this.level.monsterStep(this.gameData.rooms[this.currentRoom].speed + Math.random() * 0.1);

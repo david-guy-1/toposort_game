@@ -4,7 +4,7 @@ class map { // each room optionally has a map, a map can have multiple rooms
         this.maze = maze;
         this.size = size ; 
         this.rooms = {}; // room is : x , y -> room string (not obj)
-        this.name = name;
+        this.name = name; // name is used as a prefix
     }
     addRoom(x,y, room){
         if(this.rooms[`${x} ${y}`] !== undefined ){

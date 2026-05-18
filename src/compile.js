@@ -521,7 +521,7 @@ export function compileOne(dag, name, renderThese, assumeHas,dict,interpretation
 		var maze = generateMaze(size, size, last ? 0.3 : 0.6, seed + " generate maze" + name + " " + counter);
 		result = bfs(size, size, maze, start, start)[0]; // mazes are square, and start in the middle  
 	}
-	var thisMap = new map(maze, [dungeonSize, dungeonSize], name  + " map");
+	var thisMap = new map(maze, [dungeonSize, dungeonSize], name);
 	//////console.log(result.size)
 	// turn the maze into walledRoom
 	for(var point of result){

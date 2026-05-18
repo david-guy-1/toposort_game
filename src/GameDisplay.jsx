@@ -266,7 +266,7 @@ class GameDisplay extends React.Component {
 					for(var i=0; i < thisMap.size[0]; i++){
 						for(var j=0 ; j < thisMap.size[1]; j++){
 							var drawName = thisMap.rooms[`${i} ${j}`];
-							var color = "#333333"
+							var color = "#888888"
 							// if it's undefined, this is an unreachable room, does not exist in gameData
 							if(drawName !== undefined){
 								// portal
@@ -278,11 +278,18 @@ class GameDisplay extends React.Component {
 								if(!this.game.isRoomCompleted(drawName)){
 									color = "#519e3c";
 								}
-
+								// unvisited room
+								if(!this.game.visited.has(drawName)){
+									color = "#000000"; 
+									
+								}
 								// current room
 								if(this.currentRoom == drawName){
 									color = "#aa3333";
 								}
+
+							} else {
+								color = "#000000"
 							}
 
 		
@@ -295,6 +302,23 @@ class GameDisplay extends React.Component {
 					}
 					// walls
 					for(var wall of thisMap.maze){
+						// check if it's seen
+						let names_check = [thisMap.name + ` ${wall[0]} ${wall[1]}`];
+						if(wall[2] == "down"){
+							names_check.push(thisMap.name + ` ${wall[0]} ${wall[1]+1}`)
+						} else { 
+							names_check.push(thisMap.name + ` ${wall[0]+1} ${wall[1]}`)
+						}
+						let wall_seen = false;
+						for(let room of names_check){
+							if(this.game.visited.has(room) || room == this.game.currentRoom){
+								// draw the wall
+								wall_seen = true;
+							}
+						}
+						if(wall_seen == false){
+							continue;
+						}
 						var wallX = size[0] * (wall[0]+1)
 						var wallY = size[1] * (wall[1]+1) 
 						if(wall[2] == "right"){
